@@ -48,8 +48,8 @@ public class MenuManager : MonoBehaviour
         //GameObject.Find("ServerSearchConfrimButton").GetComponent<Button>().onClick.AddListener();
         GameObject.Find("ServerSearchBackButton").GetComponent<Button>().onClick.AddListener(ServerSearchBackButton);
 
-        GameObject.Find("PasswordJoinButton").GetComponent<Button>().onClick.AddListener(PasswordJoinButton);
-        GameObject.Find("PasswordBackButton").GetComponent<Button>().onClick.AddListener(PasswordBackButton);
+        //GameObject.Find("PasswordJoinButton").GetComponent<Button>().onClick.AddListener(PasswordJoinButton);
+        //GameObject.Find("PasswordBackButton").GetComponent<Button>().onClick.AddListener(PasswordBackButton);
 
         GameObject.Find("ErrorBackButton").GetComponent<Button>().onClick.AddListener(ErrorBackButton);
         
@@ -57,7 +57,7 @@ public class MenuManager : MonoBehaviour
         GameObject.Find("SettingsBackButton").GetComponent<Button>().onClick.AddListener(SettingsBackButton);
 
         //HostGameCanvas
-        GameObject.Find("HostGameHostButton").GetComponent<Button>().onClick.AddListener(HostGameHostButton);
+        GameObject.Find("HostGameButton").GetComponent<Button>().onClick.AddListener(HostGameHostButton);
         GameObject.Find("ServerNameField").GetComponent<InputField>().onEndEdit.AddListener(ServerNameField);
         GameObject.Find("ServerPasswordField").GetComponent<InputField>().onEndEdit.AddListener(ServerPasswordField);
         GameObject.Find("ServerPasswordToggle").GetComponent<Toggle>().onValueChanged.AddListener(ServerPasswordToggle);

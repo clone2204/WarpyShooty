@@ -37,7 +37,7 @@ public class NetworkManager : NetworkLobbyManager
 	// Update is called once per frame
 	void Update ()
     {
-	    if(Input.GetKeyDown("l"))
+	    if(Input.GetKeyDown("`"))
         {
             StopHost();
         }
@@ -79,7 +79,11 @@ public class NetworkManager : NetworkLobbyManager
     public void HostServer()
     {
         base.StartHost();
+        
+        //See if adding this to a coroutine will keep it in the server browser
         base.matchMaker.CreateMatch(serverName, 12, true, serverPassword, "", "", 0, 0, OnMatchCreate);
+        
+        menuStates.EnterGame();
 
         //lobbyManager = gameObject.AddComponent<LobbyManager_Server>();
     }
@@ -88,13 +92,21 @@ public class NetworkManager : NetworkLobbyManager
     {
         Debug.Log("Match Created");
 
-        menuStates.EnterGame();
+        if(success)
+        {
+            
+        }
+        else
+        {
+
+        }
+        
     }
 
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log("Scene Loaded: " + scene.name);
-        if (scene.name != "Lobby")
+        if (scene.name == "TitleScreen")
         {
             GetComponent<MenuManager>().SetUIActions();
             return;
@@ -230,7 +242,7 @@ public class NetworkManager : NetworkLobbyManager
         Debug.LogWarning("DING");
         Debug.LogWarning(connection.connectionId);
 
-        lobbyManager.AddPlayer(connection);
+        //lobbyManager.AddPlayer(connection);
 
         //connection.Disconnect();
     }

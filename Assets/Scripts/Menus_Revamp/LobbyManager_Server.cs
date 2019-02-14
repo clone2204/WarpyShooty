@@ -22,8 +22,8 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 
     public void AddPlayer(NetworkConnection playerConnection)
     {
-        playerConnection.clientOwnedObjects.
-        players.Add(playerConnection);
+        //playerConnection.clientOwnedObjects.
+        //players.Add(playerConnection);
     }
 
     public void BanPlayer()
