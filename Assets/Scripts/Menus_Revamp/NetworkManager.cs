@@ -32,6 +32,8 @@ public class NetworkManager : NetworkLobbyManager
         passwordEntered = false;
 
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        lobbyManager = GetComponent<LobbyManager_Proxy>();
 	}
 	
 	// Update is called once per frame
@@ -158,13 +160,13 @@ public class NetworkManager : NetworkLobbyManager
         {
             StopServerBrowser();
 
-            menuStates.CorrectPassword();
-
+            menuStates.EnterGame();
+            
             base.StartClient();
         }
         else
         {
-            menuStates.IncorrectPassword();
+            menuStates.Disconnected();
         }
     }
 
@@ -240,9 +242,9 @@ public class NetworkManager : NetworkLobbyManager
         base.OnServerConnect(connection);
 
         Debug.LogWarning("DING");
-        Debug.LogWarning(connection.connectionId);
+        Debug.LogWarning(connection);
 
-        //lobbyManager.AddPlayer(connection);
+        lobbyManager.AddPlayer(connection);
 
         //connection.Disconnect();
     }

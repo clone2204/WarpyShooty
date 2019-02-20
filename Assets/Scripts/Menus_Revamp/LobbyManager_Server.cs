@@ -22,7 +22,7 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 
     public void AddPlayer(NetworkConnection playerConnection)
     {
-        //playerConnection.clientOwnedObjects.
+        Debug.LogWarning(playerConnection.clientOwnedObjects);
         //players.Add(playerConnection);
     }
 

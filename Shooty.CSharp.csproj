@@ -76,9 +76,6 @@
     <Compile Include="Assets\Scripts\GunPickUp.cs" />
     <Compile Include="Assets\Scripts\LevelServerCommands.cs" />
     <Compile Include="Assets\Scripts\LocalPlayerController.cs" />
-    <Compile Include="Assets\Scripts\MainMenues\LANListener.cs" />
-    <Compile Include="Assets\Scripts\MainMenues\LobbyPlayerManager.cs" />
-    <Compile Include="Assets\Scripts\MainMenues\LobbyServerCommands.cs" />
     <Compile Include="Assets\Scripts\MatchInfoContainer.cs" />
     <Compile Include="Assets\Scripts\MatchManager.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\LobbyManager.cs" />

@@ -280,8 +280,8 @@ public class GunManager : NetworkBehaviour
             Debug.LogWarning(zRot);
             Quaternion rotation = Quaternion.Euler(upRot, faceRot, -zRot);
 
-            serverCommands.CmdSpawnPlayerSprayOnServer("PlayerSpray", GetComponentInChildren<SettingsManager>().spraySource, sprayPosition, rotation);
-            Debug.LogWarning(GetComponentInChildren<SettingsManager>().spraySource);
+            //serverCommands.CmdSpawnPlayerSprayOnServer("PlayerSpray", GetComponentInChildren<SettingsManager>().spraySource, sprayPosition, rotation);
+            //Debug.LogWarning(GetComponentInChildren<SettingsManager>().spraySource);
         }
 
         return sprayHit;

@@ -15,25 +15,8 @@ public class EnterPasswordState : State
     {
         throw new NotImplementedException();
     }
-
-    public void CorrectPassword()
-    {
-        GameObject.Find("ServerBrowserCanvas").GetComponent<Canvas>().enabled = false;
-        GameObject.Find("EnterPassword").transform.localPosition = new Vector3(10000, 0);
-        menuStates.SetState(menuStates.GetIngameState());
-    }
-
+    
     public void Disconnected()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void EnterGame()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void IncorrectPassword()
     {
         GameObject.Find("EnterPassword").transform.localPosition = new Vector3(10000, 0);
         GameObject.Find("ErrorMessageBox").transform.localPosition = new Vector3();
@@ -41,6 +24,13 @@ public class EnterPasswordState : State
         GameObject.Find("_SCRIPTS_").GetComponent<NetworkManager>().SetErrorMessage("Password", "Incorrect Password.");
 
         menuStates.SetState(menuStates.GetErrorMessageState());
+    }
+
+    public void EnterGame()
+    {
+        GameObject.Find("ServerBrowserCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("EnterPassword").transform.localPosition = new Vector3(10000, 0);
+        menuStates.SetState(menuStates.GetIngameState());
     }
 
     public void LeaveGame()

@@ -131,16 +131,6 @@ public class MenuStates
         currentState.NeedsPassword();
     }
 
-    public void CorrectPassword()
-    {
-        currentState.CorrectPassword();
-    }
-
-    public void IncorrectPassword()
-    {
-        currentState.IncorrectPassword();
-    }
-
     public void Disconnected()
     {
         currentState.Disconnected();

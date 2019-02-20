@@ -9,7 +9,6 @@ public class LobbyUIManager : MonoBehaviour
 {
 
     LobbyManager lobbyManager;
-    LobbyServerCommands lobbyCommands;
     Canvas lobbyCanvas;
 
     private bool canEditSettings;
@@ -20,7 +19,6 @@ public class LobbyUIManager : MonoBehaviour
         Debug.Log("LOBBYUIMANAGER INIT");
         GameObject scriptObject = GameObject.Find("_SCRIPTS_");
         lobbyManager = scriptObject.GetComponent<LobbyManager>();
-        lobbyCommands = scriptObject.GetComponentInChildren<LobbyServerCommands>();
     }
 
     // Update is called once per frame

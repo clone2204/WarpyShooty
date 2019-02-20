@@ -16,7 +16,7 @@ public class PlayerHUDManager : MonoBehaviour {
 
         gameTimer = getTextElementByName("GameTimer");
 
-        UpdatePlayerName(GetComponentInParent<PlayerInfoManager>().playerInfo.playerName);
+        //UpdatePlayerName(GetComponentInParent<PlayerInfoManager>().playerInfo.playerName);
     }
 	
 	// Update is called once per frame

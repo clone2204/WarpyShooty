@@ -12,7 +12,7 @@ public class PlayerNameTagManager : NetworkBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        playerName = this.GetComponentInParent<PlayerInfoManager>().playerInfo.playerName;
+        //playerName = this.GetComponentInParent<PlayerInfoManager>().playerInfo.playerName;
         nameTag = this.GetComponent<TextMesh>();
 
         nameTag.text = playerName;

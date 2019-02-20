@@ -28,12 +28,12 @@ public class ServerHitDetection : NetworkBehaviour
         playerHUD = transform.FindChild("PlayerHud").GetComponent<PlayerHUDManager>();
         gunManager = GetComponent<GunManager>();
         
-        playerHealth = GetComponent<PlayerInfoManager>().getPlayerFullHealth();
+        //playerHealth = GetComponent<PlayerInfoManager>().getPlayerFullHealth();
 	}
     
     public void InflictDamageOnPlayer(int damage)
     {
-        Debug.Log("INFLICT DAMAGE ON " + playerInfoManager.playerInfo.playerName);
+        //Debug.Log("INFLICT DAMAGE ON " + playerInfoManager.playerInfo.playerName);
 
         playerHealth -= damage;
         
@@ -83,7 +83,7 @@ public class ServerHitDetection : NetworkBehaviour
 
     public void RespawnPlayer()
     {
-        playerHealth = GetComponent<PlayerInfoManager>().getPlayerFullHealth();
+        //playerHealth = GetComponent<PlayerInfoManager>().getPlayerFullHealth();
 
         gunManager.CmdDropCurrentWeapon();
         gunManager.CmdSetGunToStarter();

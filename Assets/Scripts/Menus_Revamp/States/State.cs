@@ -17,10 +17,6 @@ public interface State
 
     void NeedsPassword();
 
-    void CorrectPassword();
-
-    void IncorrectPassword();
-
     void Disconnected();
 
     void OpenIngameMenu();

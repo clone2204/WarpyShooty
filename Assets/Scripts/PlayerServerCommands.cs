@@ -7,7 +7,6 @@ public class PlayerServerCommands : NetworkBehaviour
 {
     private LobbyManager lobbyManager;
     
-    private LobbyServerCommands lobbyCommands;
     private LevelServerCommands levelCommands;
 
     private List<GameObject> prefabList;
@@ -18,7 +17,6 @@ public class PlayerServerCommands : NetworkBehaviour
 
         GameObject scriptObject = GameObject.Find("_SCRIPTS_");
         lobbyManager = scriptObject.GetComponent<LobbyManager>();
-        lobbyCommands = scriptObject.GetComponentInChildren<LobbyServerCommands>();
         levelCommands = scriptObject.GetComponentInChildren<LevelServerCommands>();
 
         //this.prefabList = this.lobbyManager.spawnPrefabs;
@@ -65,7 +63,6 @@ public class PlayerServerCommands : NetworkBehaviour
         //playerInfoManager.playerInfo = new PlayerInfoManager.PlayerInfo(playerName, playerTeam); ; //<== WARNING: The server may be sending an empty PlayerInfo to the TargetRPC, investigate
 
 
-        playerInfoManager.InitPlayerInfoHUD();
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------

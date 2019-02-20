@@ -52,7 +52,7 @@ public class ProjectileBase : NetworkBehaviour {
        
         if ((other.gameObject.tag == "localPlayer" || other.gameObject.tag == "Player") && isServer)
         {
-            Debug.LogWarning("PLAYER " + other.gameObject.GetComponent<PlayerInfoManager>().playerInfo.playerName + " HIT on server: " + isServer);
+            //Debug.LogWarning("PLAYER " + other.gameObject.GetComponent<PlayerInfoManager>().playerInfo.playerName + " HIT on server: " + isServer);
             other.gameObject.GetComponent<ServerHitDetection>().InflictDamageOnPlayer(this.properties.damage);
         }
         DestroyBulletInSeconds(0);

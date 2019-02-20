@@ -11,7 +11,7 @@ public class LobbyManager_Proxy : NetworkBehaviour, LobbyManager
     {
 	    if(isServer)
         {
-            //realLobbyManager = gameObject.AddComponent<LobbyManager_Server>();
+            realLobbyManager = gameObject.AddComponent<LobbyManager_Server>();
         }
 	}
 	
