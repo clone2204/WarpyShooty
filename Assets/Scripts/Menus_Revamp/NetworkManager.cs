@@ -84,19 +84,14 @@ public class NetworkManager : NetworkLobbyManager
         lobbyManager = transform.Find("NetworkObjects").gameObject.AddComponent<LobbyManager_Proxy>();
         lobbyManager.Init();
         base.StartClient();
+
+
         //See if adding this to a coroutine will keep it in the server browser
         base.matchMaker.CreateMatch(serverName, 12, true, serverPassword, "", "", 0, 0, OnMatchCreate);
         
         menuStates.EnterGame();
 
         //lobbyManager = gameObject.AddComponent<LobbyManager_Server>();
-    }
-
-    public override NetworkClient StartHost()
-    {
-        
-
-        return base.StartHost();
     }
 
     public override void OnMatchCreate(bool success, string extendedInfo, MatchInfo matchInfo)
@@ -123,7 +118,7 @@ public class NetworkManager : NetworkLobbyManager
             return;
         }
 
-        //base.TryToAddPlayer();
+        base.TryToAddPlayer();
 
         
     }
