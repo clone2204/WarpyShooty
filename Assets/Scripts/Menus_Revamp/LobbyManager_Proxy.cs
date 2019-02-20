@@ -9,16 +9,27 @@ public class LobbyManager_Proxy : NetworkBehaviour, LobbyManager
     // Use this for initialization
     void Start ()
     {
-	    if(isServer)
-        {
-            realLobbyManager = gameObject.AddComponent<LobbyManager_Server>();
-        }
+	    
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    public void Init()
+    {
+        if (isServer)
+        {
+            Debug.LogWarning("Proxy Init");
+            realLobbyManager = gameObject.AddComponent<LobbyManager_Server>();
+            realLobbyManager.Init();
+        }
+        else
+        {
+            //Add a LobbyManager_Client?
+        }
+    }
 
     public void AddPlayer(NetworkConnection playerConnection)
     {

@@ -25,7 +25,7 @@ public class ServerHitDetection : NetworkBehaviour
         
         lobbyManager = GameObject.Find("_SCRIPTS_").GetComponent<LobbyManager>();
         playerInfoManager = GetComponent<PlayerInfoManager>();
-        playerHUD = transform.FindChild("PlayerHud").GetComponent<PlayerHUDManager>();
+        playerHUD = transform.Find("PlayerHud").GetComponent<PlayerHUDManager>();
         gunManager = GetComponent<GunManager>();
         
         //playerHealth = GetComponent<PlayerInfoManager>().getPlayerFullHealth();

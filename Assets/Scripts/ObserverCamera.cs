@@ -21,9 +21,9 @@ public class ObserverCamera : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        observerCam = transform.FindChild("ObservationCamera");
-        cameraPath = transform.FindChild("ObserverCamPath");
-        cameraFocus = transform.FindChild("ObserverCamFocalPoint");
+        observerCam = transform.Find("ObservationCamera");
+        cameraPath = transform.Find("ObserverCamPath");
+        cameraFocus = transform.Find("ObserverCamFocalPoint");
         currentNavIndex = 0;
 
         currentLocation = startLocation;
@@ -80,7 +80,7 @@ public class ObserverCamera : MonoBehaviour
             getNextNavPoint();
 
         Vector3 direction = cameraFocus.transform.position - observerCam.transform.position;
-        Transform cameraRotator = observerCam.transform.FindChild("CameraRotator");
+        Transform cameraRotator = observerCam.transform.Find("CameraRotator");
 
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         cameraRotator.rotation = Quaternion.Lerp(cameraRotator.transform.rotation, targetRotation, Time.deltaTime);
@@ -97,7 +97,7 @@ public class ObserverCamera : MonoBehaviour
 
     public void WarpCamera()
     {
-        Transform cameraRotator = observerCam.transform.FindChild("CameraRotator");
+        Transform cameraRotator = observerCam.transform.Find("CameraRotator");
 
         int warpOffset = 2000;
         float xPos = cameraRotator.localPosition.x;
@@ -124,7 +124,7 @@ public class ObserverCamera : MonoBehaviour
         float maxViewAngle = .9f;
         float minViewAngle = -.9f;
 
-        Transform cameraRotator = observerCam.transform.FindChild("CameraRotator");
+        Transform cameraRotator = observerCam.transform.Find("CameraRotator");
         Camera camera = cameraRotator.GetComponentInChildren<Camera>();
 
         cameraRotator.transform.Rotate(0, Input.GetAxis("Mouse X") * horizontalSpeed, 0);

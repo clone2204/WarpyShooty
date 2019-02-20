@@ -18,7 +18,7 @@ public class LobbyUIManager : MonoBehaviour
     {
         Debug.Log("LOBBYUIMANAGER INIT");
         GameObject scriptObject = GameObject.Find("_SCRIPTS_");
-        lobbyManager = scriptObject.GetComponent<LobbyManager>();
+        //lobbyManager = scriptObject.GetComponent<LobbyManager>();
     }
 
     // Update is called once per frame
@@ -65,10 +65,10 @@ public class LobbyUIManager : MonoBehaviour
     {
         GameObject player = GameObject.FindGameObjectWithTag("localPlayer");
         player.GetComponent<LocalPlayerController>().enabled = !currentlyEditing;
-        player.transform.FindChild("PlayerHud").GetComponent<Canvas>().enabled = !currentlyEditing;
-        player.transform.FindChild("PlayerPOV").GetComponent<BlurOptimized>().enabled = currentlyEditing;
+        player.transform.Find("PlayerHud").GetComponent<Canvas>().enabled = !currentlyEditing;
+        player.transform.Find("PlayerPOV").GetComponent<BlurOptimized>().enabled = currentlyEditing;
 
-        GameObject.Find("InfoBoard").transform.FindChild("LobbyEditUICanvas").GetComponent<Canvas>().enabled = currentlyEditing;
+        GameObject.Find("InfoBoard").transform.Find("LobbyEditUICanvas").GetComponent<Canvas>().enabled = currentlyEditing;
     }
 
     void OnTriggerEnter(Collider col)
