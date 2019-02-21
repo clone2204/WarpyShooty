@@ -28,11 +28,11 @@ public class ServerBrowser : MonoBehaviour
             if (serverEntries.ContainsValue(serverInfo.networkId))
                 continue;
 
-            GameObject newServer = (GameObject)Instantiate<GameObject>(transform.FindChild("ServerEntry").gameObject);
+            GameObject newServer = (GameObject)Instantiate<GameObject>(transform.Find("ServerEntry").gameObject);
 
-            newServer.transform.FindChild("Name").GetComponent<Text>().text = serverInfo.name;
-            newServer.transform.FindChild("Size").GetComponent<Text>().text = serverInfo.currentSize + " / 12";
-            newServer.transform.FindChild("Pass").GetComponent<Text>().text = (serverInfo.isPrivate == true ? "T" : "F");
+            newServer.transform.Find("Name").GetComponent<Text>().text = serverInfo.name;
+            newServer.transform.Find("Size").GetComponent<Text>().text = serverInfo.currentSize + " / 12";
+            newServer.transform.Find("Pass").GetComponent<Text>().text = (serverInfo.isPrivate == true ? "T" : "F");
 
             newServer.GetComponent<MatchInfoContainer>().matchInfo = serverInfo;
 
@@ -46,7 +46,7 @@ public class ServerBrowser : MonoBehaviour
     private void UpdateContentWindow()
     {
         
-        RectTransform contentWindow = transform.FindChild("ServerList").FindChild("Viewport").FindChild("Content").GetComponent<RectTransform>();
+        RectTransform contentWindow = transform.Find("ServerList").Find("Viewport").Find("Content").GetComponent<RectTransform>();
         
         int offset = 0;
         foreach (GameObject server in serverEntries.Keys)
@@ -60,7 +60,7 @@ public class ServerBrowser : MonoBehaviour
 
     public void ClearContentWindow()
     {
-        Transform contentWindow = transform.FindChild("ServerList").FindChild("Viewport").GetChild(0);
+        Transform contentWindow = transform.Find("ServerList").Find("Viewport").GetChild(0);
         int serverCount = contentWindow.childCount;
 
         for(int loop = 0;  loop < serverCount; loop++)
@@ -98,30 +98,30 @@ public class ServerBrowser : MonoBehaviour
     {
         Transform errorBox = GameObject.Find("ErrorMessageBox").transform;
 
-        errorBox.FindChild("ErrorType").GetComponent<Text>().text = type;
-        errorBox.FindChild("ErrorMessage").GetComponent<Text>().text = message;
+        errorBox.Find("ErrorType").GetComponent<Text>().text = type;
+        errorBox.Find("ErrorMessage").GetComponent<Text>().text = message;
     }
 
     public void ClearErrorMessage()
     {
         Transform errorBox = GameObject.Find("ErrorMessage").transform;
 
-        errorBox.FindChild("ErrorType").GetComponent<Text>().text = "";
-        errorBox.FindChild("ErrorMessage").GetComponent<Text>().text = "";
+        errorBox.Find("ErrorType").GetComponent<Text>().text = "";
+        errorBox.Find("ErrorMessage").GetComponent<Text>().text = "";
     }
 
     public void ClearSearchBox()
     {
         Transform searchBox = GameObject.Find("ServerSearch").transform;
 
-        searchBox.FindChild("SearchField").GetComponent<Text>().text = "";
+        searchBox.Find("SearchField").GetComponent<Text>().text = "";
     }
 
     public void ClearPasswordBox()
     {
         Transform searchBox = GameObject.Find("EnterPassword").transform;
 
-        searchBox.FindChild("PasswordEntryField").GetComponent<Text>().text = "";
+        searchBox.Find("PasswordEntryField").GetComponent<Text>().text = "";
     }
 }
 

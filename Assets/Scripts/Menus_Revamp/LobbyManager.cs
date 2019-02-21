@@ -4,6 +4,8 @@ using System.Collections;
 
 public interface LobbyManager
 {
+    void Init();
+
     void AddPlayer(NetworkConnection playerConnection);
 
     void RemovePlayer();

@@ -12,13 +12,19 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
     // Use this for initialization
     void Start ()
     {
-        players = new Dictionary<string, NetworkConnection>();
+        
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    public void Init()
+    {
+        Debug.LogWarning("Server Init");
+        players = new Dictionary<string, NetworkConnection>();
+    }
 
     public void AddPlayer(NetworkConnection playerConnection)
     {

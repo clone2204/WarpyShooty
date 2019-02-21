@@ -33,7 +33,7 @@ public class NetworkManager : NetworkLobbyManager
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        lobbyManager = GetComponent<LobbyManager_Proxy>();
+        
 	}
 	
 	// Update is called once per frame
@@ -80,8 +80,12 @@ public class NetworkManager : NetworkLobbyManager
     //------------------------------------------------------------------------------------------------------------------------------
     public void HostServer()
     {
-        base.StartHost();
-        
+        base.StartServer();
+        lobbyManager = transform.Find("NetworkObjects").gameObject.AddComponent<LobbyManager_Proxy>();
+        lobbyManager.Init();
+        base.StartClient();
+
+
         //See if adding this to a coroutine will keep it in the server browser
         base.matchMaker.CreateMatch(serverName, 12, true, serverPassword, "", "", 0, 0, OnMatchCreate);
         
@@ -243,8 +247,9 @@ public class NetworkManager : NetworkLobbyManager
 
         Debug.LogWarning("DING");
         Debug.LogWarning(connection);
+        Debug.LogWarning(lobbyManager);
 
-        lobbyManager.AddPlayer(connection);
+        //lobbyManager.AddPlayer(connection);
 
         //connection.Disconnect();
     }
