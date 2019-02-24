@@ -7,7 +7,9 @@ public interface State
 
     void OpenBrowser();
 
-    void OpenHost();
+    void HostGame();
+
+    void EnterLobby();
 
     void SearchServers();
 
@@ -21,9 +23,11 @@ public interface State
 
     void OpenIngameMenu();
 
+    void OpenIngameSettings();
+
     void LeaveGame();
 
-    void OpenIngameSettings();
+    void BackToLobby();
 
     void Back();
 }

@@ -82,4 +82,19 @@ public class SearchServersState : State
         GameObject.Find("ServerSearch").transform.localPosition = new Vector3(10000, 0);
         menuStates.SetState(menuStates.GetBrowserState());
     }
+
+    public void HostGame()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EnterLobby()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void BackToLobby()
+    {
+        throw new NotImplementedException();
+    }
 }

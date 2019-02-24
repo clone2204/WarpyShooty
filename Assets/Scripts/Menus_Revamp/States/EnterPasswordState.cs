@@ -26,11 +26,28 @@ public class EnterPasswordState : State
         menuStates.SetState(menuStates.GetErrorMessageState());
     }
 
-    public void EnterGame()
+    public void HostGame()
+    {
+
+    }
+
+    public void EnterLobby()
     {
         GameObject.Find("ServerBrowserCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("LobbyCanvas").GetComponent<Canvas>().enabled = false;
         GameObject.Find("EnterPassword").transform.localPosition = new Vector3(10000, 0);
+
         menuStates.SetState(menuStates.GetIngameState());
+    }
+
+    public void BackToLobby()
+    {
+
+    }
+
+    public void EnterGame()
+    {
+
     }
 
     public void LeaveGame()

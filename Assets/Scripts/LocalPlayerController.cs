@@ -2,7 +2,8 @@
 using UnityEngine.Networking;
 using System.Collections;
 
-public class LocalPlayerController : NetworkBehaviour {
+public class LocalPlayerController : NetworkBehaviour
+{
 
     GameObject player;
     Rigidbody physics;
@@ -57,9 +58,6 @@ public class LocalPlayerController : NetworkBehaviour {
         this.tag = "localPlayer";
 
         GetComponentInChildren<MeshRenderer>().material.color = Color.green;
-
-        PlayerServerCommands serverCommands = GetComponent<PlayerServerCommands>();
-        serverCommands.CmdSyncWeaponParents();
     }
 
     // Update is called once per frame
@@ -102,7 +100,7 @@ public class LocalPlayerController : NetworkBehaviour {
         }
         if(Input.GetKeyDown("k"))
         {
-            GetComponent<PlayerServerCommands>().CmdKillPlayerOnServer(GetComponent<NetworkIdentity>().netId);
+
         }
         if(Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -112,7 +110,7 @@ public class LocalPlayerController : NetworkBehaviour {
         //Fire Control
         if (Input.GetKeyDown("mouse 0"))
         {
-            this.gunManager.FireGun();
+            //this.gunManager.FireGun();
         }
 
         if(Input.GetKeyDown("mouse 1"))

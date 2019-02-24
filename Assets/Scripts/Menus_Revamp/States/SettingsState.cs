@@ -83,4 +83,19 @@ public class SettingsState : State
 
         menuStates.SetState(menuStates.GetMainMenuState());
     }
+
+    public void HostGame()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EnterLobby()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void BackToLobby()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -80,17 +80,11 @@ public class NetworkManager : NetworkLobbyManager
     //------------------------------------------------------------------------------------------------------------------------------
     public void HostServer()
     {
-        base.StartServer();
-        lobbyManager = transform.Find("NetworkObjects").gameObject.AddComponent<LobbyManager_Proxy>();
-        lobbyManager.Init();
-        base.StartClient();
-
+        base.StartHost();
+        
 
         //See if adding this to a coroutine will keep it in the server browser
         base.matchMaker.CreateMatch(serverName, 12, true, serverPassword, "", "", 0, 0, OnMatchCreate);
-        
-        menuStates.EnterGame();
-
         //lobbyManager = gameObject.AddComponent<LobbyManager_Server>();
     }
 
@@ -100,7 +94,7 @@ public class NetworkManager : NetworkLobbyManager
 
         if(success)
         {
-            
+
         }
         else
         {
@@ -118,7 +112,7 @@ public class NetworkManager : NetworkLobbyManager
             return;
         }
 
-        base.TryToAddPlayer();
+        //base.TryToAddPlayer();
 
         
     }
@@ -164,7 +158,7 @@ public class NetworkManager : NetworkLobbyManager
         {
             StopServerBrowser();
 
-            menuStates.EnterGame();
+            menuStates.EnterLobby();
             
             base.StartClient();
         }
@@ -245,13 +239,38 @@ public class NetworkManager : NetworkLobbyManager
     {
         base.OnServerConnect(connection);
 
-        Debug.LogWarning("DING");
-        Debug.LogWarning(connection);
-        Debug.LogWarning(lobbyManager);
+        if(lobbyManager == null)
+        {
+            lobbyManager = transform.Find("NetworkObjects").gameObject.AddComponent<LobbyManager_Proxy>();
+            lobbyManager.Init(null);
+        }
 
-        //lobbyManager.AddPlayer(connection);
+        Debug.LogWarning("DING");
+        StartCoroutine(Test());
+        //NetworkServer.FindLocalObject();
+        //base.TryToAddPlayer();
+
+        lobbyManager.AddPlayer(connection);
 
         //connection.Disconnect();
+    }
+
+    IEnumerator Test()
+    {
+        yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("localPlayer") != null);
+
+        Debug.LogWarning(GameObject.FindGameObjectWithTag("localPlayer"));
+    }
+
+    
+
+    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
+    {
+        base.OnServerAddPlayer(conn, playerControllerId, extraMessageReader);
+
+        Debug.LogWarning("ONSERVERADDPLAYER: " + conn + " || " + playerControllerId + " || " + extraMessageReader);
+
+
     }
 
     public override void OnClientConnect(NetworkConnection conn)

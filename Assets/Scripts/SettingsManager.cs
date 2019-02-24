@@ -7,6 +7,7 @@ public class SettingsManager : MonoBehaviour
     private struct Settings
     {
         public string playerName;
+
     }
 
     private Settings currentSettings;
@@ -15,7 +16,9 @@ public class SettingsManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-       
+        currentSettings = new Settings();
+        changeSettings = new Settings();
+        currentSettings.playerName = "Player";
 	}
 	
 	// Update is called once per frame
@@ -33,8 +36,12 @@ public class SettingsManager : MonoBehaviour
     {
         if(changeSettings.playerName != "")
         {
+            Debug.Log("Update Name");
             currentSettings.playerName = changeSettings.playerName;
         }
+
+
+        changeSettings = new Settings();
     }
 
     public void SavePlayerSettings()

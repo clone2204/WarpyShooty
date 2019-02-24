@@ -23,8 +23,8 @@ public class PlayerNameTagManager : NetworkBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        this.nameTag.transform.LookAt(localPlayer.transform);
-        this.nameTag.transform.Rotate(0, 180, 0);
+        //this.nameTag.transform.LookAt(localPlayer.transform);
+        //this.nameTag.transform.Rotate(0, 180, 0);
 	}
 
 }

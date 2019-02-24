@@ -9,11 +9,12 @@ public class MenuManager : MonoBehaviour
 
     private SettingsManager settingsManager;
 
-
+    //Main Menu
     private Button findGameButton;
     private Button settingsButton;
     private Button quitGameButton;
 
+    //Server Browser
     private Button hostServerButton;
     private Button searchServerButton;
     private Button joinServerButton;
@@ -29,19 +30,28 @@ public class MenuManager : MonoBehaviour
 
     private Button errorBackButton;
 
+    //Settings
     private InputField settingsPlayerNameField;
+    private Button settingsApplyButton;
     private Button settingsBackButton;
 
+    //Lobby
+    private Button lobbyReadyButton;
+    private Button lobbyBackButton;
+
+    //Host Lobby
     private InputField serverNameField;
     private InputField serverPasswordField;
     private Toggle serverPasswordToggle;
     private Button hostGameButton;
+    private Button hostGameStartButton;
     private Button hostGameBackButton;
 
 	// Use this for initialization
 	void Start ()
     {
         networkManager = GetComponent<NetworkManager>();
+        settingsManager = GetComponent<SettingsManager>();
         menuStates = new MenuStates(this);
         networkManager.SetMenuStates(menuStates);
 
@@ -77,13 +87,18 @@ public class MenuManager : MonoBehaviour
         errorBackButton = GameObject.Find("ErrorBackButton").GetComponent<Button>();
 
         settingsPlayerNameField = GameObject.Find("SettingsPlayerNameField").GetComponent<InputField>();
+        settingsApplyButton = GameObject.Find("SettingsApplyButton").GetComponent<Button>();
         settingsBackButton = GameObject.Find("SettingsBackButton").GetComponent<Button>();
+
+        lobbyReadyButton = GameObject.Find("LobbyReadyButton").GetComponent<Button>();
+        lobbyBackButton = GameObject.Find("LobbyBackButton").GetComponent<Button>();
 
         serverNameField = GameObject.Find("ServerNameField").GetComponent<InputField>();
         serverPasswordField = GameObject.Find("ServerPasswordField").GetComponent<InputField>();
         serverPasswordToggle = GameObject.Find("ServerPasswordToggle").GetComponent<Toggle>();
         hostGameButton = GameObject.Find("HostGameButton").GetComponent<Button>();
-        hostGameBackButton = GameObject.Find("HostGameBackButton").GetComponent<Button>();
+        hostGameStartButton = GameObject.Find("HostLobbyStartGameButton").GetComponent<Button>();
+        hostGameBackButton = GameObject.Find("HostLobbyBackButton").GetComponent<Button>();
 }
 
     public void SetUIActions()
@@ -101,28 +116,34 @@ public class MenuManager : MonoBehaviour
         searchServerButton.onClick.AddListener(SearchServersButton);
         //GameObject.Find("LANConnectButton").GetComponent<Button>().onClick.AddListener();
         joinServerButton.onClick.AddListener(JoinServerButton);
-        serverBrowserBackButton.onClick.AddListener(ServerBrowserBackButton);
+        serverBrowserBackButton.onClick.AddListener(Back);
 
         passwordInputField.onEndEdit.AddListener(PasswordEntryField);
         passwordConfirmButton.onClick.AddListener(PasswordConfirmButton);
-        passwordCancelButton.onClick.AddListener(PasswordCancelButton);
+        passwordCancelButton.onClick.AddListener(Back);
 
         //serverSearchField.onEndEdit.AddListener();
         //serverSearchButton.onClick.AddListener();
-        serverSearchBackButton.onClick.AddListener(ServerSearchBackButton);
+        serverSearchBackButton.onClick.AddListener(Back);
 
-        errorBackButton.onClick.AddListener(ErrorBackButton);
+        errorBackButton.onClick.AddListener(Back);
 
         //Settings Canvas
         settingsPlayerNameField.onEndEdit.AddListener(SettingsChangePlayerName);
-        settingsBackButton.onClick.AddListener(SettingsBackButton);
+        settingsApplyButton.onClick.AddListener(SettingsApplyButton);
+        settingsBackButton.onClick.AddListener(Back);
 
-        //HostGameCanvas
+        //LobbyCanvas
+        lobbyReadyButton.onClick.AddListener(LobbyReadyButton);
+        lobbyBackButton.onClick.AddListener(Back);
+
+        //HostLobbyCanvas
         serverNameField.onEndEdit.AddListener(ServerNameField);
         serverPasswordField.onEndEdit.AddListener(ServerPasswordField);
         serverPasswordToggle.onValueChanged.AddListener(ServerPasswordToggle);
         hostGameButton.onClick.AddListener(HostGameHostButton);
-        hostGameBackButton.onClick.AddListener(HostGameBackButton);
+        hostGameStartButton.onClick.AddListener(HostLobbyStartButton);
+        hostGameBackButton.onClick.AddListener(Back);
 
 
 
@@ -136,6 +157,11 @@ public class MenuManager : MonoBehaviour
 
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
+    public void Back()
+    {
+        menuStates.Back();
+    }
+
     public void QuickPlayButton()
     {
         
@@ -158,7 +184,7 @@ public class MenuManager : MonoBehaviour
 
     public void HostServerButton()
     {
-        menuStates.OpenHost();
+        menuStates.HostGame();
     }
 
     public void SearchServersButton()
@@ -180,48 +206,22 @@ public class MenuManager : MonoBehaviour
     {
         networkManager.SetJoinPassword(password);
     }
-
-    public void ServerBrowserBackButton()
-    {
-        menuStates.Back();
-    }
-
+    
     public void PasswordConfirmButton()
     {
         networkManager.SetPasswordEntered(true);
     }
-
-    public void PasswordCancelButton()
-    {
-        menuStates.Back();
-    }
-
+    
     public void ServerSearchConfrimButton()
     {
         menuStates.SearchServers();
     }
-
-    public void ServerSearchBackButton()
-    {
-        menuStates.Back();
-    }
-
+    
     public void PasswordJoinButton()
     {
         passwordInputField.text = "";
         networkManager.SetPasswordEntered(true);
     }
-
-    public void PasswordBackButton()
-    {
-        menuStates.Back();
-    }
-
-    public void ErrorBackButton()
-    {
-        menuStates.Back();
-    }
-
     
     public void HostGameHostButton()
     {
@@ -243,16 +243,10 @@ public class MenuManager : MonoBehaviour
         serverPasswordField.interactable = value;
         networkManager.SetRequirePassword(value);
     }
-
-    public void HostGameBackButton()
-    {
-        menuStates.Back();
-    }
-
+    
     public void SettingsChangePlayerName(string newName)
     {
         settingsManager.UpdatePlayerName(newName);
-        menuStates.Back();
     }
 
     public void SettingsApplyButton()
@@ -260,10 +254,14 @@ public class MenuManager : MonoBehaviour
         settingsManager.UpdatePlayerSettings();
         menuStates.Back();
     }
-
-    public void SettingsBackButton()
+    
+    public void HostLobbyStartButton()
     {
-        menuStates.Back();
+
     }
 
+    public void LobbyReadyButton()
+    {
+
+    }
 }

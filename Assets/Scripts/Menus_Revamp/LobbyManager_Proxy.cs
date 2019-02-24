@@ -17,17 +17,23 @@ public class LobbyManager_Proxy : NetworkBehaviour, LobbyManager
 	
 	}
 
-    public void Init()
+    public void Init(LobbyManager lobbyManager)
     {
         if (isServer)
         {
-            Debug.LogWarning("Proxy Init");
-            realLobbyManager = gameObject.AddComponent<LobbyManager_Server>();
-            realLobbyManager.Init();
+            realLobbyManager = gameObject.GetComponentInChildren<LobbyManager_Server>();
+            LobbyManager client = gameObject.GetComponentInChildren<LobbyManager_Client>();
+
+            realLobbyManager.Init(client);
+            client.Init(realLobbyManager);
         }
         else
         {
-            //Add a LobbyManager_Client?
+            realLobbyManager = gameObject.GetComponentInChildren<LobbyManager_Client>();
+            LobbyManager server = gameObject.GetComponentInChildren<LobbyManager_Server>();
+
+            realLobbyManager.Init(server);
+            server.Init(realLobbyManager);
         }
     }
 

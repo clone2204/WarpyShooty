@@ -8,7 +8,7 @@ public class MenuStates
     private State mainMenuState;
     private State settingsState;
     private State browserState;
-    private State hostState;
+    private State lobbyState;
     private State searchServersState;
     private State enterPasswordState;
     private State ingameState;
@@ -23,7 +23,7 @@ public class MenuStates
         mainMenuState = new MainMenuState(this);
         settingsState = new SettingsState(this);
         browserState = new ServerBrowserState(this);
-        hostState = new HostGameState(this);
+        lobbyState = new LobbyState(this);
         searchServersState = new SearchServersState(this);
         enterPasswordState = new EnterPasswordState(this);
         ingameState = new IngameState(this);
@@ -61,9 +61,9 @@ public class MenuStates
         return browserState;
     }
 
-    public State GetHostGameState()
+    public State GetLobbyState()
     {
-        return hostState;
+        return lobbyState;
     }
 
     public State GetSearchServerState()
@@ -96,6 +96,8 @@ public class MenuStates
         return ingameSettingsState;
     }
 
+    //----------------------------------------------------------------
+
     public void OpenSettings()
     {
         currentState.OpenSettings();
@@ -106,9 +108,19 @@ public class MenuStates
         currentState.OpenBrowser();
     }
 
-    public void OpenHost()
+    public void HostGame()
     {
-        currentState.OpenHost();
+        currentState.HostGame();
+    }
+
+    public void EnterLobby()
+    {
+        currentState.EnterLobby();
+    }
+
+    public void BackToLobby()
+    {
+        currentState.BackToLobby();
     }
 
     public void SearchServers()

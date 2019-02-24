@@ -6,9 +6,10 @@ using System;
 
 public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 {
+    private LobbyManager_Client client;
+
     private Dictionary<string, NetworkConnection> players;
 
-    
     // Use this for initialization
     void Start ()
     {
@@ -20,16 +21,36 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 	
 	}
 
-    public void Init()
+    public void Init(LobbyManager lobbyManager)
     {
         Debug.LogWarning("Server Init");
         players = new Dictionary<string, NetworkConnection>();
+        client = (LobbyManager_Client)lobbyManager;
     }
 
     public void AddPlayer(NetworkConnection playerConnection)
     {
-        Debug.LogWarning(playerConnection.clientOwnedObjects);
+        
         //players.Add(playerConnection);
+    }
+
+    //Currently does not work because LobbyManager_Server does not exist on client player object
+    //Solution will most likely require a networked playerInfo system.
+    //PlayerInfo -> PlayerInfo_Proxy -> PlayerInfo_Client -> PlayerInfo_Server
+
+    [TargetRpc]
+    public void TargetRpcGetPlayerName(NetworkConnection conn)
+    {
+        string name = GameObject.Find("_SCRIPTS_").GetComponent<SettingsManager>().GetPlayerName();
+        Debug.LogWarning("command");
+        CmdGetPlayerName(name);
+    }
+
+    [Command]
+    public void CmdGetPlayerName(string name)
+    {
+        Debug.LogWarning("COMMAND");
+        Debug.LogWarning(name);
     }
 
     public void BanPlayer()

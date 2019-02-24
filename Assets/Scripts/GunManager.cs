@@ -14,7 +14,6 @@ public class GunManager : NetworkBehaviour
     Canvas playerHud;
     PlayerHUDManager hudManager;
 
-    PlayerServerCommands serverCommands;
 
     private GameObject swapableGunContainer;
     public int gunSwapHoldTimeMS;
@@ -25,8 +24,6 @@ public class GunManager : NetworkBehaviour
         playerPOV = GetComponentInChildren<Camera>();
         playerHud = GetComponentInChildren<Canvas>();
         hudManager = playerHud.GetComponent<PlayerHUDManager>();
-
-        serverCommands = GetComponent<PlayerServerCommands>();
 
         if(isServer)
             CmdSetGunToStarter();
@@ -226,7 +223,7 @@ public class GunManager : NetworkBehaviour
 
     public void SpawnProjectile(string projectilePrefabName, ProjectileBase.ProjectileProperties properties)
     {
-        serverCommands.CmdSpawnServerProjectile(projectilePrefabName, properties);
+        //serverCommands.CmdSpawnServerProjectile(projectilePrefabName, properties);
     }
 
     public bool SprayPlayerSpray()

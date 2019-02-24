@@ -80,4 +80,19 @@ public class IngameSettingsState : State
     {
 
     }
+
+    public void HostGame()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EnterLobby()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void BackToLobby()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -22,12 +22,20 @@ public class ServerBrowserState : State
 
     }
 
-    public void OpenHost()
+    public void HostGame()
     {
         GameObject.Find("ServerBrowserCanvas").GetComponent<Canvas>().enabled = false;
-        GameObject.Find("HostGameCanvas").GetComponent<Canvas>().enabled = true;
+        GameObject.Find("HostLobbyCanvas").GetComponent<Canvas>().enabled = true;
 
-        menuStates.SetState(menuStates.GetHostGameState());
+        menuStates.SetState(menuStates.GetLobbyState());
+    }
+
+    public void EnterLobby()
+    {
+        GameObject.Find("ServerBrowserCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("LobbyCanvas").GetComponent<Canvas>().enabled = true;
+
+        menuStates.SetState(menuStates.GetLobbyState());
     }
 
     public void SearchServers()
@@ -46,6 +54,11 @@ public class ServerBrowserState : State
         GameObject.Find("ServerBrowserCanvas").GetComponent<Canvas>().enabled = false;
         GameObject.Find("_SCRIPTS_").GetComponent<NetworkManager>().StopServerBrowser();
         menuStates.SetState(menuStates.GetIngameState());
+    }
+
+    public void BackToLobby()
+    {
+
     }
 
     public void NeedsPassword()
