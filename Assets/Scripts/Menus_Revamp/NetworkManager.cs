@@ -245,24 +245,9 @@ public class NetworkManager : NetworkLobbyManager
             lobbyManager.Init(null);
         }
 
-        Debug.LogWarning("DING");
-        StartCoroutine(Test());
-        //NetworkServer.FindLocalObject();
-        //base.TryToAddPlayer();
-
+        Debug.Log("Player Connected.");
         lobbyManager.AddPlayer(connection);
-
-        //connection.Disconnect();
     }
-
-    IEnumerator Test()
-    {
-        yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("localPlayer") != null);
-
-        Debug.LogWarning(GameObject.FindGameObjectWithTag("localPlayer"));
-    }
-
-    
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
     {

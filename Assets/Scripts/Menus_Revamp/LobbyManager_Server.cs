@@ -30,8 +30,28 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 
     public void AddPlayer(NetworkConnection playerConnection)
     {
-        
-        //players.Add(playerConnection);
+        TargetRequestPlayerControllerNetID(playerConnection);
+    }
+
+    public void SendPlayerControllerNetID(NetworkInstanceId netID)
+    {
+        Debug.LogWarning("netID = " + netID);
+        GameObject localPlayer = NetworkServer.FindLocalObject(netID);
+        Debug.LogWarning("localPlayer = " + localPlayer.gameObject.name);
+        NetworkConnection connection = localPlayer.GetComponent<NetworkIdentity>().connectionToClient;
+        Debug.LogWarning("connection = " + connection);
+        PlayerInfoManager_Proxy playerInfo = localPlayer.GetComponent<PlayerInfoManager_Proxy>();
+        Debug.LogWarning("playerInfo = " + playerInfo);
+        string name = playerInfo.GetName();
+
+        players.Add(name, connection);
+        Debug.LogWarning(players.Count);
+    }
+
+    [TargetRpc]
+    public void TargetRequestPlayerControllerNetID(NetworkConnection conn)
+    {
+        client.RequestPlayerControllerNetID();
     }
 
     //Currently does not work because LobbyManager_Server does not exist on client player object

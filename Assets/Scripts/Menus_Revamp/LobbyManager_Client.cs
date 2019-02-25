@@ -49,4 +49,24 @@ public class LobbyManager_Client : NetworkBehaviour, LobbyManager
         throw new System.NotImplementedException();
     }
 
+    private string test = "TEST STRING ALPHA!";
+    public void RequestPlayerControllerNetID()
+    {
+        StartCoroutine(WaitForLocalPlayer());
+    }
+
+    IEnumerator WaitForLocalPlayer()
+    {
+        yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("localPlayer") != null);
+
+        NetworkInstanceId netID = GameObject.FindGameObjectWithTag("localPlayer").GetComponent<NetworkIdentity>().netId;
+        Debug.LogWarning("NetID = " + netID);
+        CmdSendPlayerControllerNetID(netID);
+    }
+
+    [Command]
+    public void CmdSendPlayerControllerNetID(NetworkInstanceId netID)
+    {
+        server.SendPlayerControllerNetID(netId);
+    }
 }
