@@ -11,7 +11,7 @@ public class PlayerListManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        playerList = transform.FindChild("PlayerList");
+        playerList = transform.Find("PlayerList");
     }
 
     // Update is called once per frame
@@ -24,7 +24,7 @@ public class PlayerListManager : MonoBehaviour
     {
         for (int loop = 0; loop < 12; loop++)
         {
-            Text name = playerList.FindChild("player" + loop).FindChild("Name").GetComponent<Text>();
+            Text name = playerList.Find("player" + loop).Find("Name").GetComponent<Text>();
             name.text = "";
         }
     }
@@ -33,7 +33,7 @@ public class PlayerListManager : MonoBehaviour
     {
         for(int loop = 0; loop < players.Count; loop++)
         {
-            Text name = playerList.FindChild("player" + loop).FindChild("Name").GetComponent<Text>();
+            Text name = playerList.Find("player" + loop).Find("Name").GetComponent<Text>();
             name.text = players[loop];
 
             if(players[loop].Equals(host))
@@ -46,6 +46,6 @@ public class PlayerListManager : MonoBehaviour
     public void ToggleTeams(bool teams)
     {
         this.teams = teams;
-        playerList.FindChild("TeamLabels").gameObject.active = teams;
+        playerList.Find("TeamLabels").gameObject.active = teams;
     }
 }

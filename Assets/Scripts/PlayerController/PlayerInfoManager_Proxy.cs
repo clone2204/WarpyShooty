@@ -7,7 +7,7 @@ public class PlayerInfoManager_Proxy : NetworkBehaviour, PlayerInfoManager
 {
     private PlayerInfoManager realInfoManager;
 
-    void Start()
+    void Awake()
     {
         if (isServer)
         {
@@ -37,11 +37,12 @@ public class PlayerInfoManager_Proxy : NetworkBehaviour, PlayerInfoManager
 
     public void Init(PlayerInfoManager playerInfoManager)
     {
-        Start();
+        Awake();
     }
 
     public void SetName(string name)
     {
+        Debug.LogWarning("Set Name: " + name);
         realInfoManager.SetName(name);
     }
 

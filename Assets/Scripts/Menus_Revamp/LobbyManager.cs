@@ -6,7 +6,7 @@ public interface LobbyManager
 {
     void Init(LobbyManager lobbyManager);
 
-    void AddPlayer(NetworkConnection playerConnection);
+    void AddPlayer(NetworkConnection playerConnection, short controllerID);
 
     void RemovePlayer();
 

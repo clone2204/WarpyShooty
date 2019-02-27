@@ -1,6 +1,6 @@
 Win
 PlayerPath?
-E:/Will's_Good_Storage_Space/Factory/TestBuild.exe
+C:/Users/jackinswp/Documents/GitHub/Shooty.exe
 SceneListBegin?
 Assets/Scenes/TitleScreen.unity
 Assets/Scenes/Lobby.unity

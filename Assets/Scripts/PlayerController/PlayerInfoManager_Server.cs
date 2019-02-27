@@ -17,7 +17,6 @@ public class PlayerInfoManager_Server : NetworkBehaviour, PlayerInfoManager
     public void SetName(string name)
     {
         this.name = name;
-        Debug.LogWarning("Server-SetName: " + name);
     }
 
     public string GetName()

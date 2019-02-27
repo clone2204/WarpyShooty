@@ -8,7 +8,7 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 {
     private LobbyManager_Client client;
 
-    private Dictionary<string, NetworkConnection> players;
+    private Dictionary<int, string> players;
     private string host;
 
     // Use this for initialization
@@ -25,31 +25,71 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
     public void Init(LobbyManager lobbyManager)
     {
         Debug.LogWarning("Server Init");
-        players = new Dictionary<string, NetworkConnection>();
+        players = new Dictionary<int, string>();
         client = (LobbyManager_Client)lobbyManager;
 
         host = null;
     }
 
-    public void AddPlayer(NetworkConnection playerConnection)
+    public void AddPlayer(NetworkConnection playerConnection, short controllerID)
     {
-        Debug.LogWarning("Add Player Server");
-        client.TargetRequestPlayerControllerNetID(playerConnection);
+        GameObject player = playerConnection.playerControllers[controllerID].gameObject;
+        PlayerInfoManager_Proxy playerInfo = player.GetComponent<PlayerInfoManager_Proxy>();
+        playerInfo.Init(null);
+
+        Debug.LogWarning(playerInfo.GetName());
         
+        
+        
+        
+        
+        
+        
+        /*
+        Debug.LogWarning("Add Player Server");
+        players.Add(playerConnection.connectionId, null);
+        StartCoroutine(WaitForClientInfo(playerConnection, players));
+    
+        playerConnection.playerControllers[0].
+        if (players.Count == 1)
+        {
+            client.AddPlayer(playerConnection);
+        }
+        */
+    }
+
+    private IEnumerator WaitForClientInfo(NetworkConnection conn, Dictionary<int, string> playerList)
+    {
+        Debug.LogWarning("Wait for Client Info");
+        yield return new WaitUntil(() => playerList[conn.connectionId] != null);
+
+        Debug.LogWarning("Client Info Processed");
+        RequestUpdatePlayerList();
+    }
+
+    [Command]
+    public void CmdRecievePlayerObject(NetworkInstanceId netID)
+    {
+        Debug.LogWarning("Client Info Recieved");
+        GameObject playerObject = NetworkServer.FindLocalObject(netID);
+        NetworkConnection connection = playerObject.GetComponent<NetworkIdentity>().connectionToServer;
+       
+        PlayerInfoManager_Proxy playerInfo = playerObject.GetComponent<PlayerInfoManager_Proxy>();
+
+        players[connection.connectionId] = playerInfo.GetName();
     }
     
     [Command]
     public void CmdRecievePlayerControllerNetID(NetworkInstanceId netID)
     {
-        Debug.LogWarning(netID);
+        Debug.LogWarning("Server Recieve Player ID: " + netID);
 
         GameObject localPlayer = NetworkServer.FindLocalObject(netID);
         NetworkConnection connection = localPlayer.GetComponent<NetworkIdentity>().connectionToClient;
         PlayerInfoManager_Proxy playerInfo = localPlayer.GetComponent<PlayerInfoManager_Proxy>();
         string name = playerInfo.GetName();
 
-        players.Add(name, connection);
-        Debug.LogWarning(players.Count);
+        //players.Add(name, connection);
 
         if (host == null)
             host = name;
@@ -62,7 +102,7 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
     private void RequestUpdatePlayerList()
     {
         string[] playerList = new string[players.Count];
-        List<string> temp = new List<string>(players.Keys);
+        List<string> temp = new List<string>(players.Values);
 
         for(int loop = 0; loop < players.Count; loop++)
         {
@@ -76,14 +116,7 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
     //Solution will most likely require a networked playerInfo system.
     //PlayerInfo -> PlayerInfo_Proxy -> PlayerInfo_Client -> PlayerInfo_Server
 
-    [TargetRpc]
-    public void TargetRpcGetPlayerName(NetworkConnection conn)
-    {
-        string name = GameObject.Find("_SCRIPTS_").GetComponent<SettingsManager>().GetPlayerName();
-        Debug.LogWarning("command");
-        CmdGetPlayerName(name);
-    }
-
+    
     [Command]
     public void CmdGetPlayerName(string name)
     {

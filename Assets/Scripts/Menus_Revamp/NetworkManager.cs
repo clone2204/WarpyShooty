@@ -33,8 +33,9 @@ public class NetworkManager : NetworkLobbyManager
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        
-	}
+        lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager_Proxy>();
+        //transform.Find("NetworkObjects").gameObject.active = true;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -239,28 +240,35 @@ public class NetworkManager : NetworkLobbyManager
     {
         base.OnServerConnect(connection);
 
-        if(lobbyManager == null)
+        
+    }
+
+    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+    {
+        base.OnServerAddPlayer(conn, playerControllerId);
+
+        if (!((LobbyManager_Proxy)lobbyManager).GetBeenInitialized())
         {
-            lobbyManager = transform.Find("NetworkObjects").gameObject.AddComponent<LobbyManager_Proxy>();
             lobbyManager.Init(null);
         }
 
         Debug.Log("Player Connected.");
-        lobbyManager.AddPlayer(connection);
-    }
-
-    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
-    {
-        base.OnServerAddPlayer(conn, playerControllerId, extraMessageReader);
-
-        Debug.LogWarning("ONSERVERADDPLAYER: " + conn + " || " + playerControllerId + " || " + extraMessageReader);
-
-
+        lobbyManager.AddPlayer(conn, playerControllerId);
     }
 
     public override void OnClientConnect(NetworkConnection conn)
     {
         base.OnClientConnect(conn);
+
+        if (NetworkServer.active)
+            return;
+
+        if (!((LobbyManager_Proxy)lobbyManager).GetBeenInitialized())
+        {
+            lobbyManager.Init(null);
+        }
+
+        //lobbyManager.AddPlayer(conn);
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)

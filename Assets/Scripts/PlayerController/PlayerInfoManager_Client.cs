@@ -14,14 +14,12 @@ public class PlayerInfoManager_Client : NetworkBehaviour, PlayerInfoManager
 
     public void SetName(string name)
     {
-        Debug.LogWarning("Non-Command Set Name");
         CmdSetName(name);
     }
 
     [Command]
     public void CmdSetName(string name)
     {
-        Debug.LogWarning("CMD Set Name");
         server.SetName(name);
     }
 

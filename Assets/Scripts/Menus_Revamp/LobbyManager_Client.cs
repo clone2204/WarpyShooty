@@ -34,9 +34,12 @@ public class LobbyManager_Client : NetworkBehaviour, LobbyManager
         }
     }
 
-    public void AddPlayer(NetworkConnection playerConnection)
+    public void AddPlayer(NetworkConnection playerConnection, short controllerID)
     {
-        throw new System.NotImplementedException();
+        Debug.LogWarning("Add Player Client");
+
+        
+        //StartCoroutine(WaitForLocalPlayerSpawn(playerConnection));
     }
 
     public void BanPlayer()
@@ -59,26 +62,35 @@ public class LobbyManager_Client : NetworkBehaviour, LobbyManager
         throw new System.NotImplementedException();
     }
 
-    [TargetRpc]
-    public void TargetRequestPlayerControllerNetID(NetworkConnection conn)
+    private IEnumerator WaitForLocalPlayerSpawn(NetworkConnection playerConnection)
     {
-        StartCoroutine(WaitForLocalPlayer());
-    }
-
-    private IEnumerator WaitForLocalPlayer()
-    {
+        Debug.LogWarning("Wait for Local Player Object Spawn");
         yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("localPlayer") != null);
 
-        NetworkInstanceId netID = GameObject.FindGameObjectWithTag("localPlayer").GetComponent<NetworkIdentity>().netId;
-        Debug.LogWarning("NetID = " + netID);
 
-        server.CmdRecievePlayerControllerNetID(netID);
+        Debug.LogWarning(ClientScene.localPlayers.Count);
+
+        NetworkInstanceId netID = GameObject.FindGameObjectWithTag("localPlayer").GetComponent<NetworkIdentity>().netId;
+        Debug.LogWarning("Local Player Spawned with NetID = " + netID);
+
+        server.CmdRecievePlayerObject(netID);
     }
-    
+
     [ClientRpc]
     public void RpcUpdatePlayerList(string[] players, string host)
     {
+        Debug.LogWarning("Client Update Player List");
+
         List<string> playerList = new List<string>(players);
         listManager.UpdatePlayerList(playerList, host);
     }
+
+    [TargetRpc]
+    public void TargetRpcGetPlayerName(NetworkConnection conn)
+    {
+        string name = GameObject.Find("_SCRIPTS_").GetComponent<SettingsManager>().GetPlayerName();
+        Debug.LogWarning("command");
+        server.CmdGetPlayerName(name);
+    }
+
 }
