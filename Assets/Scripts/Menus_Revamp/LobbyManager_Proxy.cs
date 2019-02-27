@@ -39,6 +39,7 @@ public class LobbyManager_Proxy : NetworkBehaviour, LobbyManager
 
     public void AddPlayer(NetworkConnection playerConnection)
     {
+        Debug.LogWarning("AddPlayer");
         realLobbyManager.AddPlayer(playerConnection);
     }
 

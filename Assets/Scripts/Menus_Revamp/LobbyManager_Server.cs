@@ -9,6 +9,7 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
     private LobbyManager_Client client;
 
     private Dictionary<string, NetworkConnection> players;
+    private string host;
 
     // Use this for initialization
     void Start ()
@@ -26,32 +27,49 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
         Debug.LogWarning("Server Init");
         players = new Dictionary<string, NetworkConnection>();
         client = (LobbyManager_Client)lobbyManager;
+
+        host = null;
     }
 
     public void AddPlayer(NetworkConnection playerConnection)
     {
-        TargetRequestPlayerControllerNetID(playerConnection);
+        Debug.LogWarning("Add Player Server");
+        client.TargetRequestPlayerControllerNetID(playerConnection);
+        
     }
-
-    public void SendPlayerControllerNetID(NetworkInstanceId netID)
+    
+    [Command]
+    public void CmdRecievePlayerControllerNetID(NetworkInstanceId netID)
     {
-        Debug.LogWarning("netID = " + netID);
+        Debug.LogWarning(netID);
+
         GameObject localPlayer = NetworkServer.FindLocalObject(netID);
-        Debug.LogWarning("localPlayer = " + localPlayer.gameObject.name);
         NetworkConnection connection = localPlayer.GetComponent<NetworkIdentity>().connectionToClient;
-        Debug.LogWarning("connection = " + connection);
         PlayerInfoManager_Proxy playerInfo = localPlayer.GetComponent<PlayerInfoManager_Proxy>();
-        Debug.LogWarning("playerInfo = " + playerInfo);
         string name = playerInfo.GetName();
 
         players.Add(name, connection);
         Debug.LogWarning(players.Count);
+
+        if (host == null)
+            host = name;
+
+        RequestUpdatePlayerList();
     }
 
-    [TargetRpc]
-    public void TargetRequestPlayerControllerNetID(NetworkConnection conn)
+    
+
+    private void RequestUpdatePlayerList()
     {
-        client.RequestPlayerControllerNetID();
+        string[] playerList = new string[players.Count];
+        List<string> temp = new List<string>(players.Keys);
+
+        for(int loop = 0; loop < players.Count; loop++)
+        {
+            playerList[loop] = temp[loop];
+        }
+
+        client.RpcUpdatePlayerList(playerList, host);
     }
 
     //Currently does not work because LobbyManager_Server does not exist on client player object

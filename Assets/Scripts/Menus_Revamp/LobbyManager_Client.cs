@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class LobbyManager_Client : NetworkBehaviour, LobbyManager
 {
     private LobbyManager_Server server;
+    private PlayerListManager listManager;
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +23,15 @@ public class LobbyManager_Client : NetworkBehaviour, LobbyManager
     public void Init(LobbyManager lobbyManager)
     {
         server = (LobbyManager_Server)lobbyManager;
+
+        if(isServer)
+        {
+            listManager = GameObject.Find("HostLobbyCanvas").GetComponent<PlayerListManager>();
+        }
+        else
+        {
+            listManager = GameObject.Find("LobbyCanvas").GetComponent<PlayerListManager>();
+        }
     }
 
     public void AddPlayer(NetworkConnection playerConnection)
@@ -49,24 +59,26 @@ public class LobbyManager_Client : NetworkBehaviour, LobbyManager
         throw new System.NotImplementedException();
     }
 
-    private string test = "TEST STRING ALPHA!";
-    public void RequestPlayerControllerNetID()
+    [TargetRpc]
+    public void TargetRequestPlayerControllerNetID(NetworkConnection conn)
     {
         StartCoroutine(WaitForLocalPlayer());
     }
 
-    IEnumerator WaitForLocalPlayer()
+    private IEnumerator WaitForLocalPlayer()
     {
         yield return new WaitUntil(() => GameObject.FindGameObjectWithTag("localPlayer") != null);
 
         NetworkInstanceId netID = GameObject.FindGameObjectWithTag("localPlayer").GetComponent<NetworkIdentity>().netId;
         Debug.LogWarning("NetID = " + netID);
-        CmdSendPlayerControllerNetID(netID);
-    }
 
-    [Command]
-    public void CmdSendPlayerControllerNetID(NetworkInstanceId netID)
+        server.CmdRecievePlayerControllerNetID(netID);
+    }
+    
+    [ClientRpc]
+    public void RpcUpdatePlayerList(string[] players, string host)
     {
-        server.SendPlayerControllerNetID(netId);
+        List<string> playerList = new List<string>(players);
+        listManager.UpdatePlayerList(playerList, host);
     }
 }
