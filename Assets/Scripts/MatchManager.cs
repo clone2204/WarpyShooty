@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class MatchManager : MonoBehaviour
 {
 
-    LobbyManager lobbyManager;
+    ILobbyManager lobbyManager;
     PlayerHUDManager hudManager;
     
    
@@ -17,7 +17,7 @@ public class MatchManager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        lobbyManager = GetComponent<LobbyManager>();
+        lobbyManager = GetComponent<ILobbyManager>();
 
         
 	}

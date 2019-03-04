@@ -4,7 +4,6 @@ using System;
 
 public class LobbyState : State
 {
-
     private MenuStates menuStates;
 
     public LobbyState(MenuStates menuStates)
@@ -83,7 +82,7 @@ public class LobbyState : State
 
     public void LeaveGame()
     {
-        throw new NotImplementedException();
+        menuStates.SetState(menuStates.GetMainMenuState());
     }
 
     public void OpenIngameSettings()

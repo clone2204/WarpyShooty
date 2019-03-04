@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
+using UnityEngine.Networking.Types;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,57 +14,32 @@ public class NetworkManager : NetworkLobbyManager
     private bool browserActive;
 
     private LobbyManager lobbyManager;
-
-    private string serverName;
-    private bool serverRequiresPassword;
-    private string serverPassword;
+    private MatchInfo matchInfo;
 
     private string joinPassword;
     private bool passwordEntered;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start()
     {
-        serverName = "";
-        serverRequiresPassword = false;
-        serverPassword = "";
-
         joinPassword = "";
         passwordEntered = false;
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
-
-        lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager_Proxy>();
-        //transform.Find("NetworkObjects").gameObject.active = true;
+        lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager>();
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
-	    if(Input.GetKeyDown("`"))
+        if(Input.GetKeyDown("`"))
         {
-            StopHost();
+            base.StopClient();
         }
-	}
+    }
 
     public void SetMenuStates(MenuStates menuStates)
     {
         this.menuStates = menuStates; //Can I do better than this?
-    }
-
-    public void SetServerName(string name)
-    {
-        serverName = name;
-    }
-
-    public void SetServerPassword(string pass)
-    {
-        serverPassword = pass;
-    }
-
-    public void SetRequirePassword(bool require)
-    {
-        serverRequiresPassword = require;
     }
 
     public void SetJoinPassword(string pass)
@@ -77,51 +53,75 @@ public class NetworkManager : NetworkLobbyManager
     }
 
     //------------------------------------------------------------------------------------------------------------------------------
-    //Hosts a new server, switchin over to the lobby scene, and starting a new server
     //------------------------------------------------------------------------------------------------------------------------------
-    public void HostServer()
-    {
-        base.StartHost();
-        
 
-        //See if adding this to a coroutine will keep it in the server browser
+    public void SetErrorMessage(string type, string message)
+    {
+        serverBrowser.SetErrorMessage(type, message);
+    }
+
+    public void ClearErrorMessage()
+    {
+        serverBrowser.ClearServerEntries();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------------
+    //Server Hosting Functions
+    //------------------------------------------------------------------------------------------------------------------------------
+    #region
+    public void HostServer(string serverName, string serverPassword)
+    {
+        lobbyManager.Init();
+
+        base.StartHost();
         base.matchMaker.CreateMatch(serverName, 12, true, serverPassword, "", "", 0, 0, OnMatchCreate);
-        //lobbyManager = gameObject.AddComponent<LobbyManager_Server>();
     }
 
     public override void OnMatchCreate(bool success, string extendedInfo, MatchInfo matchInfo)
     {
         Debug.Log("Match Created");
-
-        if(success)
+        
+        if (success)
         {
-
+            this.matchInfo = matchInfo;
         }
         else
         {
-
+            base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
         }
-        
     }
 
-    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    public void LeaveHostLobby()
     {
-        Debug.Log("Scene Loaded: " + scene.name);
-        if (scene.name == "TitleScreen")
+        if (client == null)
         {
-            GetComponent<MenuManager>().SetUIActions();
+            menuStates.Back();
             return;
         }
+        menuStates.LeaveGame();
 
-        //base.TryToAddPlayer();
+        base.matchMaker.DestroyMatch(matchInfo.networkId, 0, OnDestroyMatch);
 
-        
+        StopServerBrowser();
+        lobbyManager.Clear();
+
+        base.client.Disconnect();
+        base.StopHost();
     }
 
-    //------------------------------------------------------------------------------------------------------------------------------
-    //Joins a Server, switches over to the lobby scene, then starts the client
-    //------------------------------------------------------------------------------------------------------------------------------
+    public override void OnDestroyMatch(bool success, string extendedInfo)
+    {
+        base.OnDestroyMatch(success, extendedInfo);
 
+        Debug.LogWarning("Match Destroyed");
+    }
+
+    #endregion
+
+    //------------------------------------------------------------------------------------------------------------------------------
+    //Client Joining Functions
+    //------------------------------------------------------------------------------------------------------------------------------
+    #region
     public void JoinMatch()
     {
         MatchInfoSnapshot matchInfo = serverBrowser.GetSelectedServer();
@@ -153,14 +153,12 @@ public class NetworkManager : NetworkLobbyManager
     {
         Debug.LogWarning("Match Joined: " + success);
 
-        //base.TryToAddPlayer();
-
         if (success)
         {
             StopServerBrowser();
 
             menuStates.EnterLobby();
-            
+
             base.StartClient();
         }
         else
@@ -169,22 +167,21 @@ public class NetworkManager : NetworkLobbyManager
         }
     }
 
-    //------------------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------------------
-
-    public void SetErrorMessage(string type, string message)
+    public void LeaveLobby()
     {
-        serverBrowser.SetErrorMessage(type, message);
-    }
+        menuStates.LeaveGame();
+        StopServerBrowser();
+        lobbyManager.Clear();
 
-    public void ClearErrorMessage()
-    {
-        serverBrowser.ClearServerEntries();
+        base.client.Disconnect();
+        base.StopClient();
     }
-    
-    //------------------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------------------
+    #endregion
 
+    //------------------------------------------------------------------------------------------------------------------------------
+    //Match Maker Functions
+    //------------------------------------------------------------------------------------------------------------------------------
+    #region
     public void StartServerBrowser()
     {
         serverBrowser = GameObject.Find("ServerBrowserCanvas").GetComponent<ServerBrowser>();
@@ -192,7 +189,7 @@ public class NetworkManager : NetworkLobbyManager
         browserActive = true;
         base.StartMatchMaker();
         StartCoroutine(ServerListAutoRefresh(serverBrowser.GetServerListRefreshTime()));
-        
+
     }
 
     public void StopServerBrowser()
@@ -227,32 +224,33 @@ public class NetworkManager : NetworkLobbyManager
         try
         {
             Debug.Log("Adding Servers: " + matches.Count);
-
             serverBrowser.AddNewServers(matches);
         }
         catch { }
     }
+    #endregion
 
     //------------------------------------------------------------------------------------------------------------------------------
+    //Event Calls
     //------------------------------------------------------------------------------------------------------------------------------
-
+    #region
     public override void OnServerConnect(NetworkConnection connection)
     {
         base.OnServerConnect(connection);
 
-        
+
     }
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
         base.OnServerAddPlayer(conn, playerControllerId);
 
-        if (!((LobbyManager_Proxy)lobbyManager).GetBeenInitialized())
+        if (!((LobbyManager)lobbyManager).GetBeenInitialized())
         {
             lobbyManager.Init(null);
         }
 
-        Debug.Log("Player Connected.");
+        Debug.Log("Player Connected");
         lobbyManager.AddPlayer(conn, playerControllerId);
     }
 
@@ -263,9 +261,9 @@ public class NetworkManager : NetworkLobbyManager
         if (NetworkServer.active)
             return;
 
-        if (!((LobbyManager_Proxy)lobbyManager).GetBeenInitialized())
+        if (!((LobbyManager)lobbyManager).GetBeenInitialized())
         {
-            lobbyManager.Init(null);
+            //lobbyManager.Init(null);
         }
 
         //lobbyManager.AddPlayer(conn);
@@ -275,7 +273,8 @@ public class NetworkManager : NetworkLobbyManager
     {
         base.OnServerDisconnect(conn);
 
-        //menuStates.LeaveGame();
+        Debug.LogWarning("Player Disconnected");
+        lobbyManager.RemovePlayer(conn);
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -284,12 +283,5 @@ public class NetworkManager : NetworkLobbyManager
 
         menuStates.LeaveGame();
     }
-
-    public override void OnLobbyStopHost()
-    {
-        base.OnLobbyStopHost();
-
-        Debug.LogWarning("DING");
-        menuStates.LeaveGame();
-    }
+    #endregion
 }

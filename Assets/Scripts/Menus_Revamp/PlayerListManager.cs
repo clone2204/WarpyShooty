@@ -31,15 +31,19 @@ public class PlayerListManager : MonoBehaviour
 
     public void UpdatePlayerList(List<string> players, string host)
     {
+        ClearPlayerList();
+        
         for(int loop = 0; loop < players.Count; loop++)
         {
             Text name = playerList.Find("player" + loop).Find("Name").GetComponent<Text>();
-            name.text = players[loop];
+            string displayName = players[loop];
 
             if(players[loop].Equals(host))
             {
-                //Indicate host here
+                displayName += " *";
             }
+
+            name.text = displayName;
         }
     }
 

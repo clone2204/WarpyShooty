@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerInfoManager_Client : NetworkBehaviour, PlayerInfoManager
+public class PlayerInfoManager_Client : NetworkBehaviour, IPlayerInfoManager
 {
     private PlayerInfoManager_Server server;
 
-    public void Init(PlayerInfoManager playerInfoManager)
+    public void Init(IPlayerInfoManager playerInfoManager)
     {
         server = (PlayerInfoManager_Server)playerInfoManager;
     }
 
-    public void SetName(string name)
+    public void SetPlayerID(int ID)
     {
-        CmdSetName(name);
+        throw new System.NotImplementedException();
     }
 
-    [Command]
-    public void CmdSetName(string name)
+    public int GetPlayerID()
     {
-        server.SetName(name);
+        return server.GetPlayerID();
+    }
+
+    public void SetName(string name)
+    {
+        server.CmdSetName(name);
     }
 
     public string GetName()
@@ -28,4 +32,24 @@ public class PlayerInfoManager_Client : NetworkBehaviour, PlayerInfoManager
         return server.GetName();
     }
 
+    
+    public NetworkInstanceId GetPlayerObjectID()
+    {
+        return server.GetPlayerObjectID();
+    }
+    
+    public NetworkConnection GetPlayerConnection()
+    {
+        return server.GetPlayerConnection();
+    }
+
+    public void SetPlayerObjectID(NetworkInstanceId playerObjectID)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void SetPlayerConnection(NetworkConnection networkConnection)
+    {
+        throw new System.NotImplementedException();
+    }
 }

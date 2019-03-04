@@ -8,7 +8,7 @@ using UnityStandardAssets.ImageEffects;
 public class LobbyUIManager : MonoBehaviour
 {
 
-    LobbyManager lobbyManager;
+    ILobbyManager lobbyManager;
     Canvas lobbyCanvas;
 
     private bool canEditSettings;

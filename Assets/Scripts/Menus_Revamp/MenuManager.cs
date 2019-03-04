@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class MenuManager : MonoBehaviour
@@ -57,16 +58,24 @@ public class MenuManager : MonoBehaviour
 
         UIInit();
         SetUIActions();
-	}
-	
-	// Update is called once per frame
-	void Update ()
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-	
-	}
+        Debug.Log("Scene Loaded: " + scene.name);
+        if (scene.name == "TitleScreen")
+        {
+            UIInit();
+            SetUIActions();
+        }
+    }
 
     public void UIInit()
     {
+        Debug.Log("Finding UI Objects");
+
         findGameButton = GameObject.Find("FindGameButton").GetComponent<Button>();
         settingsButton = GameObject.Find("SettingsButton").GetComponent<Button>();
         quitGameButton = GameObject.Find("QuitGameButton").GetComponent<Button>();
@@ -135,17 +144,15 @@ public class MenuManager : MonoBehaviour
 
         //LobbyCanvas
         lobbyReadyButton.onClick.AddListener(LobbyReadyButton);
-        lobbyBackButton.onClick.AddListener(Back);
+        lobbyBackButton.onClick.AddListener(LobbyBack);
 
         //HostLobbyCanvas
-        serverNameField.onEndEdit.AddListener(ServerNameField);
-        serverPasswordField.onEndEdit.AddListener(ServerPasswordField);
+        //serverNameField.onEndEdit.AddListener(ServerNameField);
+        //serverPasswordField.onEndEdit.AddListener(ServerPasswordField);
         serverPasswordToggle.onValueChanged.AddListener(ServerPasswordToggle);
         hostGameButton.onClick.AddListener(HostGameHostButton);
         hostGameStartButton.onClick.AddListener(HostLobbyStartButton);
-        hostGameBackButton.onClick.AddListener(Back);
-
-
+        hostGameBackButton.onClick.AddListener(LobbyHostBack);
 
         //GameObject.Find("").GetComponent<Button>().onClick.AddListener();
 
@@ -162,6 +169,18 @@ public class MenuManager : MonoBehaviour
         menuStates.Back();
     }
 
+    public void LobbyHostBack()
+    {
+        networkManager.LeaveHostLobby();
+        menuStates.Back();
+    }
+
+    public void LobbyBack()
+    {
+        networkManager.LeaveLobby();
+        menuStates.Back();
+    }
+
     public void QuickPlayButton()
     {
         
@@ -169,6 +188,7 @@ public class MenuManager : MonoBehaviour
 
     public void FindGameButton()
     {
+        Debug.LogWarning("DIIING");
         menuStates.OpenBrowser();
     }
 
@@ -225,23 +245,23 @@ public class MenuManager : MonoBehaviour
     
     public void HostGameHostButton()
     {
-        networkManager.HostServer();
-    }
+        string serverName = serverNameField.text;
+        string serverPassword = "";
 
-    public void ServerNameField(string name)
-    {
-        networkManager.SetServerName(name);
-    }
+        if (serverPasswordToggle.isOn)
+            serverPassword = serverPasswordField.text;
 
-    public void ServerPasswordField(string password)
-    {
-        networkManager.SetServerPassword(password);
+        serverNameField.interactable = false;
+        serverPasswordToggle.interactable = false;
+        serverPasswordField.interactable = false;
+        hostGameButton.interactable = false;
+
+        networkManager.HostServer(serverName, serverPassword);
     }
 
     public void ServerPasswordToggle(bool value)
     {
         serverPasswordField.interactable = value;
-        networkManager.SetRequirePassword(value);
     }
     
     public void SettingsChangePlayerName(string newName)

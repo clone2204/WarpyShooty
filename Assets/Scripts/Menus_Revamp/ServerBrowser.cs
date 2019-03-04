@@ -21,6 +21,7 @@ public class ServerBrowser : MonoBehaviour
 
     public void AddNewServers(List<MatchInfoSnapshot> servers)
     {
+        ClearContentWindow();
 
         foreach (MatchInfoSnapshot serverInfo in servers)
         {

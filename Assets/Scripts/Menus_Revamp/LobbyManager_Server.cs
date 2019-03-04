@@ -4,12 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class LobbyManager_Server : NetworkBehaviour, LobbyManager
+public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 {
-    private LobbyManager_Client client;
+    private LobbyManager clientProxy;
 
-    private Dictionary<int, string> players;
-    private string host;
+    private Dictionary<int, PlayerInfoManager> players;
+    private int hostID;
 
     // Use this for initialization
     void Start ()
@@ -22,106 +22,73 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
 	
 	}
 
-    public void Init(LobbyManager lobbyManager)
+    public void Init(ILobbyManager lobbyManager)
     {
         Debug.LogWarning("Server Init");
-        players = new Dictionary<int, string>();
-        client = (LobbyManager_Client)lobbyManager;
+        players = new Dictionary<int, PlayerInfoManager>();
+        clientProxy = (LobbyManager)lobbyManager;
 
-        host = null;
+        hostID = 0;
+    }
+
+    public void Clear()
+    {
+        clientProxy = null;
+        players = null;
+        hostID = 0;
     }
 
     public void AddPlayer(NetworkConnection playerConnection, short controllerID)
     {
+        StartCoroutine(WaitForClientInfo(playerConnection, controllerID));
+    }
+
+    private IEnumerator WaitForClientInfo(NetworkConnection playerConnection, short controllerID)
+    {
         GameObject player = playerConnection.playerControllers[controllerID].gameObject;
-        PlayerInfoManager_Proxy playerInfo = player.GetComponent<PlayerInfoManager_Proxy>();
+        PlayerInfoManager playerInfo = player.GetComponent<PlayerInfoManager>();
         playerInfo.Init(null);
 
-        Debug.LogWarning(playerInfo.GetName());
+        yield return new WaitUntil(() => playerInfo.GetName() != null);
         
-        
-        
-        
-        
-        
-        
-        /*
-        Debug.LogWarning("Add Player Server");
-        players.Add(playerConnection.connectionId, null);
-        StartCoroutine(WaitForClientInfo(playerConnection, players));
-    
-        playerConnection.playerControllers[0].
-        if (players.Count == 1)
+        //Generates a random player ID and ensures it is unique
+        System.Random rand = new System.Random();
+        int randomPlayerID = rand.Next();
+        while(players.ContainsKey(randomPlayerID))
         {
-            client.AddPlayer(playerConnection);
+            randomPlayerID = rand.Next();
         }
-        */
-    }
 
-    private IEnumerator WaitForClientInfo(NetworkConnection conn, Dictionary<int, string> playerList)
-    {
-        Debug.LogWarning("Wait for Client Info");
-        yield return new WaitUntil(() => playerList[conn.connectionId] != null);
+        if (players.Count == 0)
+            hostID = randomPlayerID;
 
-        Debug.LogWarning("Client Info Processed");
-        RequestUpdatePlayerList();
-    }
+        playerInfo.SetPlayerID(randomPlayerID);
+        playerInfo.SetPlayerObjectID(player.GetComponent<NetworkIdentity>().netId);
+        playerInfo.SetPlayerConnection(playerConnection);
 
-    [Command]
-    public void CmdRecievePlayerObject(NetworkInstanceId netID)
-    {
-        Debug.LogWarning("Client Info Recieved");
-        GameObject playerObject = NetworkServer.FindLocalObject(netID);
-        NetworkConnection connection = playerObject.GetComponent<NetworkIdentity>().connectionToServer;
-       
-        PlayerInfoManager_Proxy playerInfo = playerObject.GetComponent<PlayerInfoManager_Proxy>();
-
-        players[connection.connectionId] = playerInfo.GetName();
-    }
-    
-    [Command]
-    public void CmdRecievePlayerControllerNetID(NetworkInstanceId netID)
-    {
-        Debug.LogWarning("Server Recieve Player ID: " + netID);
-
-        GameObject localPlayer = NetworkServer.FindLocalObject(netID);
-        NetworkConnection connection = localPlayer.GetComponent<NetworkIdentity>().connectionToClient;
-        PlayerInfoManager_Proxy playerInfo = localPlayer.GetComponent<PlayerInfoManager_Proxy>();
-        string name = playerInfo.GetName();
-
-        //players.Add(name, connection);
-
-        if (host == null)
-            host = name;
+        players.Add(randomPlayerID, playerInfo);
 
         RequestUpdatePlayerList();
     }
 
     
-
-    private void RequestUpdatePlayerList()
+    public void RemovePlayer(NetworkConnection playerConnection)
     {
-        string[] playerList = new string[players.Count];
-        List<string> temp = new List<string>(players.Values);
-
-        for(int loop = 0; loop < players.Count; loop++)
+        int playerToRemove = 0;
+        foreach(int player in players.Keys)
         {
-            playerList[loop] = temp[loop];
+            if(players[player].GetPlayerConnection().Equals(playerConnection))
+            {
+                Debug.LogWarning("Removing: " + players[player].GetName());
+                playerToRemove = player;
+            }
         }
 
-        client.RpcUpdatePlayerList(playerList, host);
-    }
+        Debug.LogWarning(players.Count);
+        players.Remove(playerToRemove);
+        Debug.LogWarning(players.Count);
 
-    //Currently does not work because LobbyManager_Server does not exist on client player object
-    //Solution will most likely require a networked playerInfo system.
-    //PlayerInfo -> PlayerInfo_Proxy -> PlayerInfo_Client -> PlayerInfo_Server
-
-    
-    [Command]
-    public void CmdGetPlayerName(string name)
-    {
-        Debug.LogWarning("COMMAND");
-        Debug.LogWarning(name);
+        RequestUpdatePlayerList();
     }
 
     public void BanPlayer()
@@ -134,14 +101,25 @@ public class LobbyManager_Server : NetworkBehaviour, LobbyManager
         throw new NotImplementedException();
     }
 
-    public void RemovePlayer()
-    {
-        throw new NotImplementedException();
-    }
-
+   
     public void SwapPlayers()
     {
         throw new NotImplementedException();
     }
 
+    private void RequestUpdatePlayerList()
+    {
+        Debug.LogWarning("Request Player List Update");
+
+        string[] playerList = new string[players.Count];
+        List<PlayerInfoManager> temp = new List<PlayerInfoManager>(players.Values);
+
+        for (int loop = 0; loop < players.Count; loop++)
+        {
+            playerList[loop] = temp[loop].GetName();
+        }
+
+        Debug.LogWarning(playerList.Length);
+        clientProxy.RpcUpdatePlayerList(playerList, players[hostID].GetName());
+    }
 }

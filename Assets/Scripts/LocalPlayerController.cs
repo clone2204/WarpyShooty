@@ -11,7 +11,7 @@ public class LocalPlayerController : NetworkBehaviour
 
     private Warp_Proxy warpManager;
 
-    private PlayerInfoManager infoManager;
+    private IPlayerInfoManager infoManager;
     private PlayerHUDManager hudManager;
     private GunManager gunManager;
 
@@ -40,7 +40,7 @@ public class LocalPlayerController : NetworkBehaviour
 
         warpManager = GetComponent<Warp_Proxy>();
 
-        infoManager = GetComponent<PlayerInfoManager>();
+        infoManager = GetComponent<IPlayerInfoManager>();
         hudManager = GetComponentInChildren<PlayerHUDManager>();
         gunManager = GetComponent<GunManager>();
 

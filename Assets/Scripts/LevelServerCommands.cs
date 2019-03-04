@@ -63,7 +63,7 @@ public class LevelServerCommands : NetworkBehaviour {
     public void CmdDamagePlayerOnServer(NetworkInstanceId playerID, int damageAmount)
     {
         GameObject player = NetworkServer.FindLocalObject(playerID);
-        PlayerInfoManager playerInfoScript = player.GetComponent<PlayerInfoManager>();
+        IPlayerInfoManager playerInfoScript = player.GetComponent<IPlayerInfoManager>();
 
         //playerInfoScript.InflictDamageOnPlayer(damageAmount);
 
@@ -78,7 +78,7 @@ public class LevelServerCommands : NetworkBehaviour {
             return;
 
         GameObject player = ClientScene.FindLocalObject(playerID);
-        PlayerInfoManager playerInfoScript = player.GetComponent<PlayerInfoManager>();
+        IPlayerInfoManager playerInfoScript = player.GetComponent<IPlayerInfoManager>();
 
         //playerInfoScript.InflictDamageOnPlayer(damageAmount);
     }
