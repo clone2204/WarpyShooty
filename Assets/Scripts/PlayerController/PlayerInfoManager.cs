@@ -57,16 +57,6 @@ public class PlayerInfoManager : NetworkBehaviour, IPlayerInfoManager
         return realInfoManager.GetName();
     }
 
-    public void SetPlayerID(int ID)
-    {
-        realInfoManager.SetPlayerID(ID);
-    }
-
-    public int GetPlayerID()
-    {
-        return realInfoManager.GetPlayerID();
-    }
-
     public void SetPlayerObjectID(NetworkInstanceId playerObjectID)
     {
         realInfoManager.SetPlayerObjectID(playerObjectID);

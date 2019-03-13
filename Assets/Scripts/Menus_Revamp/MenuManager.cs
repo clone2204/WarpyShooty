@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour
 {
@@ -55,18 +56,7 @@ public class MenuManager : MonoBehaviour
 
     //Interactive Player List
     private ToggleGroup playerListGroup;
-    private Toggle player0;
-    private Toggle player1;
-    private Toggle player2;
-    private Toggle player3;
-    private Toggle player4;
-    private Toggle player5;
-    private Toggle player6;
-    private Toggle player7;
-    private Toggle player8;
-    private Toggle player9;
-    private Toggle player10;
-    private Toggle player11;
+    
 
     // Use this for initialization
     void Start ()
@@ -138,11 +128,14 @@ public class MenuManager : MonoBehaviour
         hostGameButton = GameObject.Find("HostGameButton").GetComponent<Button>();
         hostGameStartButton = GameObject.Find("HostLobbyStartGameButton").GetComponent<Button>();
         hostGameBackButton = GameObject.Find("HostLobbyBackButton").GetComponent<Button>();
+
         hostGameSwapButton = GameObject.Find("HostLobbySwapButton").GetComponent<Button>();
         hostGameKickButton = GameObject.Find("HostLobbyKickButton").GetComponent<Button>();
         hostGameBanButton = GameObject.Find("HostLobbyBanButton").GetComponent<Button>();
         hostGameConfirmButton = GameObject.Find("HostLobbyConfirmButton").GetComponent<Button>();
         hostGameCancelButton = GameObject.Find("HostLobbyCancelButton").GetComponent<Button>();
+
+        playerListGroup = GameObject.Find("HostLobbyCanvas").transform.Find("PlayerList").GetComponent<ToggleGroup>();
 }
 
     public void SetUIActions()
@@ -188,6 +181,7 @@ public class MenuManager : MonoBehaviour
         hostGameButton.onClick.AddListener(HostGameHostButton);
         hostGameStartButton.onClick.AddListener(HostLobbyStartButton);
         hostGameBackButton.onClick.AddListener(LobbyHostBack);
+
         hostGameSwapButton.onClick.AddListener(StartSwap);
         hostGameKickButton.onClick.AddListener(StartKick);
         hostGameBanButton.onClick.AddListener(StartBan);
@@ -331,7 +325,10 @@ public class MenuManager : MonoBehaviour
 
     public void StartKick()
     {
+        SetPlayerListTogglesActive(true);
+        SetHostActionsActive(false);
 
+        networkManager.StartKick(GetSelectedPlayers);
     }
 
     public void StartBan()
@@ -341,11 +338,59 @@ public class MenuManager : MonoBehaviour
 
     public void ConfirmLobbyHostAction()
     {
+        SetPlayerListTogglesActive(false);
+        SetHostActionsActive(true);
 
+        networkManager.ConfirmHostAction();
     }
 
     public void CancelLobbyHostAction()
     {
+        SetPlayerListTogglesActive(false);
+        SetHostActionsActive(true);
 
+        networkManager.CancelHostAction();
+    }
+
+    public void SelectPlayer()
+    {
+
+    }
+
+    private void SetHostActionsActive(bool active)
+    {
+        hostGameConfirmButton.interactable = !active;
+        hostGameCancelButton.interactable = !active;
+
+        hostGameSwapButton.interactable = active;
+        hostGameKickButton.interactable = active;
+        hostGameBanButton.interactable = active;
+    }
+
+    private void SetPlayerListTogglesActive(bool active)
+    {
+        Transform playerList = GameObject.Find("HostLobbyCanvas").transform.Find("PlayerList");
+
+        foreach(Toggle player in playerList.GetComponentsInChildren<Toggle>())
+        {
+            player.interactable = active;
+        }
+    }
+
+    private List<int> GetSelectedPlayers()
+    {
+        Transform playerList = GameObject.Find("HostLobbyCanvas").transform.Find("PlayerList");
+        List<int> selectedPlayers = new List<int>();
+
+        foreach (Toggle player in playerList.GetComponentsInChildren<Toggle>())
+        {
+            if (player.isOn)
+            {
+                selectedPlayers.Add(int.Parse(player.transform.name.Substring(6)));
+                Debug.LogWarning(int.Parse(player.transform.name.Substring(6)));
+            }
+        }
+
+        return selectedPlayers;
     }
 }

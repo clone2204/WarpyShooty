@@ -17,6 +17,8 @@ public class NetworkManager : NetworkLobbyManager
     private bool matchOpen;
 
     private string passwordAttempt;
+    private bool hostActionConfirmed;
+    private bool hostActionCancelled;
 
     // Use this for initialization
     void Start()
@@ -243,24 +245,36 @@ public class NetworkManager : NetworkLobbyManager
     //Lobby Host Actions
     //------------------------------------------------------------------------------------------------------------------------------
     #region
-    public void StartKick()
+    public void StartKick(System.Func<List<int>> GetSelected)
     {
-        StartCoroutine(WaitForKickSelection()); 
+        hostActionConfirmed = false;
+        hostActionCancelled = false;
+
+        StartCoroutine(WaitForKickSelection(GetSelected));
     }
 
-    private IEnumerator WaitForKickSelection()
+    private IEnumerator WaitForKickSelection(System.Func<List<int>> GetSelected)
     {
-        yield return new WaitUntil(TEST);
+        yield return new WaitUntil(() => hostActionConfirmed || hostActionCancelled);
+
+        if(hostActionConfirmed)
+        {
+            List<int> selectedPlayers = GetSelected();
+            lobbyManager.KickPlayers(selectedPlayers);
+        }
+
+        hostActionConfirmed = false;
+        hostActionCancelled = false;
+    }
+    
+    public void ConfirmHostAction()
+    {
+        this.hostActionConfirmed = true;
     }
 
-    public System.Func<bool> TEST()
+    public void CancelHostAction()
     {
-        return TEST2;
-    }
-
-    public bool TEST2()
-    {
-        return true;
+        this.hostActionCancelled = true;
     }
     #endregion
 

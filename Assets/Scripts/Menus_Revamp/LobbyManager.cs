@@ -55,24 +55,25 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
         realLobbyManager.AddPlayer(playerConnection, controllerID);        
     }
 
-    public void BanPlayer()
-    {
-        realLobbyManager.BanPlayer();
-    }
-
-    public void KickPlayer(NetworkConnection playerConnection)
-    {
-        realLobbyManager.KickPlayer(playerConnection);
-    }
-
     public void RemovePlayer(NetworkConnection playerConnection)
     {
         realLobbyManager.RemovePlayer(playerConnection);
     }
 
-    public void SwapPlayers()
+    public void BanPlayers(List<int> players)
     {
-        realLobbyManager.SwapPlayers();
+        realLobbyManager.BanPlayers(players);
+    }
+
+    public void KickPlayers(List<int> players)
+    {
+        realLobbyManager.KickPlayers(players);
+    }
+
+    
+    public void SwapPlayers(List<int> players)
+    {
+        realLobbyManager.SwapPlayers(players);
     }
 
     public bool GetBeenInitialized()
@@ -81,12 +82,12 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
     }
 
     [ClientRpc]
-    public void RpcUpdatePlayerList(string[] players, int hostNum)
+    public void RpcUpdatePlayerList(string[] players)
     {
         Debug.Log("Client Update Player List");
 
         List<string> playerList = new List<string>(players);
-        listManager.UpdatePlayerList(playerList, hostNum);
+        listManager.UpdatePlayerList(playerList);
     }
 
 }

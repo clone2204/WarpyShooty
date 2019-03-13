@@ -8,9 +8,8 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 {
     private LobbyManager clientProxy;
 
-    private Dictionary<int, PlayerInfoManager> players;
-    private int hostID;
-
+    private PlayerInfoManager[] players;
+    
     // Use this for initialization
     void Start ()
     {
@@ -24,17 +23,14 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 
     public void Init(ILobbyManager lobbyManager)
     {
-        players = new Dictionary<int, PlayerInfoManager>();
+        players = new PlayerInfoManager[12];
         clientProxy = (LobbyManager)lobbyManager;
-
-        hostID = 0;
     }
 
     public void Clear()
     {
         clientProxy = null;
         players = null;
-        hostID = 0;
     }
 
     public void AddPlayer(NetworkConnection playerConnection, short controllerID)
@@ -50,22 +46,23 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 
         yield return new WaitUntil(() => playerInfo.GetName() != null);
         
-        //Generates a random player ID and ensures it is unique
-        System.Random rand = new System.Random();
-        int randomPlayerID = rand.Next();
-        while(players.ContainsKey(randomPlayerID))
-        {
-            randomPlayerID = rand.Next();
-        }
-
-        if (players.Count == 0)
-            hostID = randomPlayerID;
-
-        playerInfo.SetPlayerID(randomPlayerID);
         playerInfo.SetPlayerObjectID(player.GetComponent<NetworkIdentity>().netId);
         playerInfo.SetPlayerConnection(playerConnection);
 
-        players.Add(randomPlayerID, playerInfo);
+        //Temp Solution
+        for(int loop = 0; loop < 6; loop++)
+        {
+            if(players[loop] == null)
+            {
+                players[loop] = playerInfo;
+                break;
+            }
+            else if(players[loop + 6] == null)
+            {
+                players[loop + 6] = playerInfo;
+                break;
+            }
+        }
 
         RequestUpdatePlayerList();
     }
@@ -73,35 +70,35 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
     
     public void RemovePlayer(NetworkConnection playerConnection)
     {
-        int playerToRemove = 0;
-        foreach(int player in players.Keys)
+        for (int loop = 0; loop < 12; loop++)
         {
-            if(players[player].GetPlayerConnection().Equals(playerConnection))
+            if (players[loop] != null && players[loop].GetPlayerConnection().Equals(playerConnection))
             {
-                Debug.LogWarning("Removing: " + players[player].GetName());
-                playerToRemove = player;
+                players[loop] = null;
             }
         }
-
-        Debug.LogWarning(players.Count);
-        players.Remove(playerToRemove);
-        Debug.LogWarning(players.Count);
 
         RequestUpdatePlayerList();
     }
 
-    public void BanPlayer()
+    public void BanPlayers(List<int> players)
     {
         throw new NotImplementedException();
     }
 
-    public void KickPlayer(NetworkConnection playerConnection)
+    public void KickPlayers(List<int> players)
     {
-        throw new NotImplementedException();
+        foreach(int player in players)
+        {
+            if (player == 0 || this.players[player] == null)
+                continue;
+
+            this.players[player].GetPlayerConnection().Disconnect();
+        }
     }
 
    
-    public void SwapPlayers()
+    public void SwapPlayers(List<int> players)
     {
         throw new NotImplementedException();
     }
@@ -109,19 +106,24 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
     private void RequestUpdatePlayerList()
     {
         Debug.Log("Request Player List Update");
-
-        string[] playerList = new string[players.Count];
-        List<PlayerInfoManager> temp = new List<PlayerInfoManager>(players.Values);
-
-        int hostNum = 0;
-        for (int loop = 0; loop < players.Count; loop++)
+        
+        string[] playerList = new string[12];
+        
+        for (int loop = 0; loop < 12; loop++)
         {
-            playerList[loop] = temp[loop].GetName();
+            if(players[loop] == null)
+            {
+                playerList[loop] = "";
+            }
+            else
+            {
+                playerList[loop] = players[loop].GetName();
+            }
 
-            if (temp[loop].GetPlayerID() == hostID)
-                hostNum = loop;
+            Debug.LogWarning("Slot " + loop + ": " + playerList[loop]);
         }
 
-        clientProxy.RpcUpdatePlayerList(playerList, hostNum);
+        clientProxy.RpcUpdatePlayerList(playerList);
     }
+
 }

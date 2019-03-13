@@ -12,16 +12,6 @@ public class PlayerInfoManager_Client : NetworkBehaviour, IPlayerInfoManager
         server = (PlayerInfoManager_Server)playerInfoManager;
     }
 
-    public void SetPlayerID(int ID)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public int GetPlayerID()
-    {
-        return server.GetPlayerID();
-    }
-
     public void SetName(string name)
     {
         server.CmdSetName(name);

@@ -23,7 +23,7 @@ public class PlayerListManager : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerList(List<string> players, int hostNum)
+    public void UpdatePlayerList(List<string> players)
     {
         ClearPlayerList();
         
@@ -32,7 +32,7 @@ public class PlayerListManager : MonoBehaviour
             Text name = transform.Find("PlayerList").Find("player" + loop).Find("Name").GetComponent<Text>();
             string displayName = players[loop];
 
-            if(loop == hostNum)
+            if(loop == 0)
             {
                 displayName += " *";
             }

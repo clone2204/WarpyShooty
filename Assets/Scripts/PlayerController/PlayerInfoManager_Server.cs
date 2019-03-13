@@ -7,7 +7,6 @@ public class PlayerInfoManager_Server : NetworkBehaviour, IPlayerInfoManager
 {
     private PlayerInfoManager_Client client;
 
-    [SyncVar] private int playerID;
     [SyncVar] private string playerName;
     //Team here
 
@@ -17,16 +16,6 @@ public class PlayerInfoManager_Server : NetworkBehaviour, IPlayerInfoManager
     public void Init(IPlayerInfoManager playerInfoManager)
     {
         client = (PlayerInfoManager_Client)playerInfoManager;
-    }
-
-    public void SetPlayerID(int playerID)
-    {
-        this.playerID = playerID;
-    }
-
-    public int GetPlayerID()
-    {
-        return this.playerID;
     }
 
     public void SetName(string name)

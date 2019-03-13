@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic;
 
 public interface ILobbyManager
 {
@@ -12,9 +13,9 @@ public interface ILobbyManager
 
     void RemovePlayer(NetworkConnection playerConnection);
 
-    void SwapPlayers();
+    void SwapPlayers(List<int> players);
 
-    void KickPlayer(NetworkConnection playerConnection);
+    void KickPlayers(List<int> players);
 
-    void BanPlayer();
+    void BanPlayers(List<int> players);
 }
