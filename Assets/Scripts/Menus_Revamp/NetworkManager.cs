@@ -9,23 +9,36 @@ using System.Collections.Generic;
 
 public class NetworkManager : NetworkLobbyManager
 {
-    private MenuStates menuStates; //Can't I do better than this tangled mess?
+    private MenuStateManager menuStates; //Can't I do better than this tangled mess?
     private ServerBrowser serverBrowser;
-    private bool browserActive;
-
+    
     private LobbyManager lobbyManager;
     private MatchInfo matchInfo;
+    private bool matchOpen;
 
-    private string joinPassword;
-    private bool passwordEntered;
+    private string passwordAttempt;
 
     // Use this for initialization
     void Start()
     {
-        joinPassword = "";
-        passwordEntered = false;
-
+        serverBrowser = GameObject.Find("ServerBrowserCanvas").GetComponent<ServerBrowser>();
         lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager>();
+        base.StartMatchMaker();
+
+        StartCoroutine(AutoRefreshServerBrowser());
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log("Scene Loaded: " + scene.name);
+        if (scene.name == "TitleScreen")
+        {
+            serverBrowser = GameObject.Find("ServerBrowserCanvas").GetComponent<ServerBrowser>();
+            lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager>();
+            base.StartMatchMaker();
+        }
     }
 
     // Update is called once per frame
@@ -37,34 +50,11 @@ public class NetworkManager : NetworkLobbyManager
         }
     }
 
-    public void SetMenuStates(MenuStates menuStates)
+    public void SetMenuStates(MenuStateManager menuStates)
     {
         this.menuStates = menuStates; //Can I do better than this?
     }
-
-    public void SetJoinPassword(string pass)
-    {
-        joinPassword = pass;
-    }
-
-    public void SetPasswordEntered(bool entered)
-    {
-        passwordEntered = entered;
-    }
-
-    //------------------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------------------
-
-    public void SetErrorMessage(string type, string message)
-    {
-        serverBrowser.SetErrorMessage(type, message);
-    }
-
-    public void ClearErrorMessage()
-    {
-        serverBrowser.ClearServerEntries();
-    }
-
+    
     //------------------------------------------------------------------------------------------------------------------------------
     //Server Hosting Functions
     //------------------------------------------------------------------------------------------------------------------------------
@@ -74,15 +64,29 @@ public class NetworkManager : NetworkLobbyManager
         lobbyManager.Init();
 
         base.StartHost();
-        base.matchMaker.CreateMatch(serverName, 12, true, serverPassword, "", "", 0, 0, OnMatchCreate);
+        matchOpen = true;
+
+        StartCoroutine(AutoRefreshServer(serverName, serverPassword));
+    }
+
+    private IEnumerator AutoRefreshServer(string name, string password)
+    {
+        while (matchOpen)
+        {
+            Debug.LogWarning("Refreshing Match......");
+            base.matchMaker.CreateMatch(name, 12, true, password, "", "", 0, 0, OnMatchCreate);
+
+            yield return new WaitForSecondsRealtime(31f);
+        }
+
+        StopCoroutine("PingServer");
     }
 
     public override void OnMatchCreate(bool success, string extendedInfo, MatchInfo matchInfo)
     {
-        Debug.Log("Match Created");
-        
         if (success)
         {
+            Debug.LogWarning(".......Match Created!");
             this.matchInfo = matchInfo;
         }
         else
@@ -90,23 +94,29 @@ public class NetworkManager : NetworkLobbyManager
             base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
         }
     }
-
+    
     public void LeaveHostLobby()
     {
-        if (client == null)
+        if (!isNetworkActive)
         {
+            Debug.LogWarning("Non-Host Back");
             menuStates.Back();
             return;
         }
+
+        Debug.LogWarning("Attemp Match Destroy");
+        NetworkServer.DisconnectAll();
+        base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+
+        matchOpen = false;
+        this.matchInfo = null;
+        
+        StopCoroutine("PingServer");
+
         menuStates.LeaveGame();
-
-        base.matchMaker.DestroyMatch(matchInfo.networkId, 0, OnDestroyMatch);
-
-        StopServerBrowser();
         lobbyManager.Clear();
-
-        base.client.Disconnect();
-        base.StopHost();
+        StopMatchMaker();
+        StopHost();
     }
 
     public override void OnDestroyMatch(bool success, string extendedInfo)
@@ -114,6 +124,7 @@ public class NetworkManager : NetworkLobbyManager
         base.OnDestroyMatch(success, extendedInfo);
 
         Debug.LogWarning("Match Destroyed");
+        
     }
 
     #endregion
@@ -122,100 +133,98 @@ public class NetworkManager : NetworkLobbyManager
     //Client Joining Functions
     //------------------------------------------------------------------------------------------------------------------------------
     #region
-    public void JoinMatch()
-    {
-        MatchInfoSnapshot matchInfo = serverBrowser.GetSelectedServer();
-
-        if (matchInfo.isPrivate)
+        public void JoinMatch()
         {
-            menuStates.NeedsPassword();
+            MatchInfoSnapshot matchInfo = serverBrowser.GetSelectedServer();
 
-            joinPassword = "";
-            passwordEntered = false;
+            if (matchInfo.isPrivate)
+            {
+                menuStates.NeedsPassword();
 
-            StartCoroutine(WaitForPassword(matchInfo));
+                StartCoroutine(WaitForPassword(matchInfo));
+            }
+            else
+            {
+                matchMaker.JoinMatch(matchInfo.networkId, "", "", "", 0, 0, OnMatchJoined);
+            }
+
         }
-        else
+
+        public void EnterPassword(string password)
         {
-            matchMaker.JoinMatch(matchInfo.networkId, "", "", "", 0, 0, OnMatchJoined);
+            passwordAttempt = password;
         }
 
-    }
-
-    private IEnumerator WaitForPassword(MatchInfoSnapshot matchInfo)
-    {
-        yield return new WaitUntil(() => passwordEntered);
-
-        matchMaker.JoinMatch(matchInfo.networkId, joinPassword, "", "", 0, 0, OnMatchJoined);
-    }
-
-    public override void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo)
-    {
-        Debug.LogWarning("Match Joined: " + success);
-
-        if (success)
+        private IEnumerator WaitForPassword(MatchInfoSnapshot matchInfo)
         {
-            StopServerBrowser();
+            passwordAttempt = "";
 
-            menuStates.EnterLobby();
+            yield return new WaitUntil(() => passwordAttempt != "");
 
-            base.StartClient();
+            matchMaker.JoinMatch(matchInfo.networkId, passwordAttempt, "", "", 0, 0, OnMatchJoined);
+            passwordAttempt = "";
         }
-        else
+
+        public override void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo)
         {
-            menuStates.Disconnected();
+            Debug.LogWarning("Match Joined: " + success);
+
+            if (success)
+            {
+                base.StartClient();
+                menuStates.EnterLobby();
+
+                this.matchInfo = matchInfo;
+            }
+            else
+            {
+                menuStates.Disconnected("Error", "Could not connect to Server.");
+            }
         }
-    }
 
-    public void LeaveLobby()
-    {
-        menuStates.LeaveGame();
-        StopServerBrowser();
-        lobbyManager.Clear();
+        public void LeaveLobby()
+        {
+            Debug.LogWarning("Leave Lobby: " + base.matchMaker);
 
-        base.client.Disconnect();
-        base.StopClient();
-    }
+            menuStates.LeaveGame();
+        
+            lobbyManager.Clear();
+            StopMatchMaker();
+            StopClient();
+        }
+
+        public override void OnDropConnection(bool success, string extendedInfo)
+        {
+            base.OnDropConnection(success, extendedInfo);
+
+            Debug.LogWarning("DROP CONNECTION");
+        }
     #endregion
 
     //------------------------------------------------------------------------------------------------------------------------------
     //Match Maker Functions
     //------------------------------------------------------------------------------------------------------------------------------
     #region
-    public void StartServerBrowser()
-    {
-        serverBrowser = GameObject.Find("ServerBrowserCanvas").GetComponent<ServerBrowser>();
-
-        browserActive = true;
-        base.StartMatchMaker();
-        StartCoroutine(ServerListAutoRefresh(serverBrowser.GetServerListRefreshTime()));
-
-    }
-
-    public void StopServerBrowser()
-    {
-        serverBrowser.ClearContentWindow();
-
-        StopCoroutine("ServerListAutoRefresh");
-        base.StopMatchMaker();
-        browserActive = false;
-
-        GameObject.Find("JoinServerButton").GetComponent<Button>().interactable = false;
-    }
-
     public void RefreshServerBrowser()
     {
-        base.matchMaker.ListMatches(0, 50, "", false, 0, 0, OnInternetMatchList);
+        base.matchMaker.ListMatches(0, 10, "", false, 0, 0, OnInternetMatchList);
     }
 
-    private IEnumerator ServerListAutoRefresh(int refreshTime)
+    private IEnumerator AutoRefreshServerBrowser()
     {
-        while (browserActive)
+        while (true)
         {
-            Debug.LogWarning("LIST MATCHES: ");
+            yield return new WaitUntil(() => menuStates.GetState() is ServerBrowserState);
 
-            RefreshServerBrowser();
-            yield return new WaitForSecondsRealtime(refreshTime);
+            Debug.LogWarning(menuStates.GetState());
+            while(menuStates.GetState() is ServerBrowserState)
+            {
+                RefreshServerBrowser();
+
+                yield return new WaitForSecondsRealtime(5f);
+            }
+
+            GameObject.Find("JoinServerButton").GetComponent<Button>().interactable = false;
         }
     }
 
@@ -231,57 +240,89 @@ public class NetworkManager : NetworkLobbyManager
     #endregion
 
     //------------------------------------------------------------------------------------------------------------------------------
+    //Lobby Host Actions
+    //------------------------------------------------------------------------------------------------------------------------------
+    #region
+    public void StartKick()
+    {
+        StartCoroutine(WaitForKickSelection()); 
+    }
+
+    private IEnumerator WaitForKickSelection()
+    {
+        yield return new WaitUntil(TEST);
+    }
+
+    public System.Func<bool> TEST()
+    {
+        return TEST2;
+    }
+
+    public bool TEST2()
+    {
+        return true;
+    }
+    #endregion
+
+    //------------------------------------------------------------------------------------------------------------------------------
     //Event Calls
     //------------------------------------------------------------------------------------------------------------------------------
     #region
-    public override void OnServerConnect(NetworkConnection connection)
-    {
-        base.OnServerConnect(connection);
-
-
-    }
-
-    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
-    {
-        base.OnServerAddPlayer(conn, playerControllerId);
-
-        if (!((LobbyManager)lobbyManager).GetBeenInitialized())
+        public override void OnLobbyServerConnect(NetworkConnection connection)
         {
-            lobbyManager.Init(null);
+            base.OnLobbyServerConnect(connection);
+
+
         }
 
-        Debug.Log("Player Connected");
-        lobbyManager.AddPlayer(conn, playerControllerId);
-    }
-
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        base.OnClientConnect(conn);
-
-        if (NetworkServer.active)
-            return;
-
-        if (!((LobbyManager)lobbyManager).GetBeenInitialized())
+        public override void OnLobbyClientEnter()
         {
-            //lobbyManager.Init(null);
+            base.OnLobbyClientEnter();
+
+            Debug.LogWarning("LOBBY CLIENT ENTER");
         }
 
-        //lobbyManager.AddPlayer(conn);
-    }
+        public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+        {
+            base.OnServerAddPlayer(conn, playerControllerId);
 
-    public override void OnServerDisconnect(NetworkConnection conn)
-    {
-        base.OnServerDisconnect(conn);
+            if (!((LobbyManager)lobbyManager).GetBeenInitialized())
+            {
+                lobbyManager.Init(null);
+            }
 
-        Debug.LogWarning("Player Disconnected");
-        lobbyManager.RemovePlayer(conn);
-    }
+            Debug.Log("PLAYER ADDED");
+            lobbyManager.AddPlayer(conn, playerControllerId);
+        }
 
-    public override void OnClientDisconnect(NetworkConnection conn)
-    {
-        base.OnClientDisconnect(conn);
+        public override void OnLobbyClientConnect(NetworkConnection conn)
+        {
+            base.OnLobbyClientConnect(conn);
 
-        menuStates.LeaveGame();
-    }
+            Debug.LogWarning("CLIENT CONNECT");
+            //menuStates.EnterLobby();
+        }
+
+        public override void OnServerDisconnect(NetworkConnection conn)
+        {
+            if (conn.lastError == NetworkError.Ok)
+                base.OnServerDisconnect(conn);
+
+            NetworkServer.DestroyPlayersForConnection(conn);
+        
+            lobbyManager.RemovePlayer(conn);
+        }
+
+        public override void OnClientDisconnect(NetworkConnection conn)
+        {
+            if(conn.lastError == NetworkError.Ok)
+                base.OnClientDisconnect(conn);
+
+            Debug.LogWarning("CLIENT DISCONNECT");
+            ClientScene.DestroyAllClientObjects();
+
+            menuStates.Disconnected("Disconnected.", conn.lastError.ToString());
+
+        }
     #endregion
 }

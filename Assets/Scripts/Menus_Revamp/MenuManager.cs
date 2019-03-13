@@ -5,7 +5,7 @@ using System.Collections;
 
 public class MenuManager : MonoBehaviour
 {
-    private MenuStates menuStates;
+    private MenuStateManager menuStates;
     private NetworkManager networkManager;
 
     private SettingsManager settingsManager;
@@ -47,13 +47,33 @@ public class MenuManager : MonoBehaviour
     private Button hostGameButton;
     private Button hostGameStartButton;
     private Button hostGameBackButton;
+    private Button hostGameSwapButton;
+    private Button hostGameKickButton;
+    private Button hostGameBanButton;
+    private Button hostGameConfirmButton;
+    private Button hostGameCancelButton;
 
-	// Use this for initialization
-	void Start ()
+    //Interactive Player List
+    private ToggleGroup playerListGroup;
+    private Toggle player0;
+    private Toggle player1;
+    private Toggle player2;
+    private Toggle player3;
+    private Toggle player4;
+    private Toggle player5;
+    private Toggle player6;
+    private Toggle player7;
+    private Toggle player8;
+    private Toggle player9;
+    private Toggle player10;
+    private Toggle player11;
+
+    // Use this for initialization
+    void Start ()
     {
         networkManager = GetComponent<NetworkManager>();
         settingsManager = GetComponent<SettingsManager>();
-        menuStates = new MenuStates(this);
+        menuStates = new MenuStateManager();
         networkManager.SetMenuStates(menuStates);
 
         UIInit();
@@ -71,6 +91,16 @@ public class MenuManager : MonoBehaviour
             SetUIActions();
         }
     }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown("l"))
+        {
+            Debug.Log("State: " + menuStates.GetState().ToString());
+        }
+    }
+
 
     public void UIInit()
     {
@@ -108,6 +138,11 @@ public class MenuManager : MonoBehaviour
         hostGameButton = GameObject.Find("HostGameButton").GetComponent<Button>();
         hostGameStartButton = GameObject.Find("HostLobbyStartGameButton").GetComponent<Button>();
         hostGameBackButton = GameObject.Find("HostLobbyBackButton").GetComponent<Button>();
+        hostGameSwapButton = GameObject.Find("HostLobbySwapButton").GetComponent<Button>();
+        hostGameKickButton = GameObject.Find("HostLobbyKickButton").GetComponent<Button>();
+        hostGameBanButton = GameObject.Find("HostLobbyBanButton").GetComponent<Button>();
+        hostGameConfirmButton = GameObject.Find("HostLobbyConfirmButton").GetComponent<Button>();
+        hostGameCancelButton = GameObject.Find("HostLobbyCancelButton").GetComponent<Button>();
 }
 
     public void SetUIActions()
@@ -127,9 +162,9 @@ public class MenuManager : MonoBehaviour
         joinServerButton.onClick.AddListener(JoinServerButton);
         serverBrowserBackButton.onClick.AddListener(Back);
 
-        passwordInputField.onEndEdit.AddListener(PasswordEntryField);
+        //passwordInputField.onEndEdit.AddListener(PasswordEntryField);
         passwordConfirmButton.onClick.AddListener(PasswordConfirmButton);
-        passwordCancelButton.onClick.AddListener(Back);
+        passwordCancelButton.onClick.AddListener(PasswordCancelButton);
 
         //serverSearchField.onEndEdit.AddListener();
         //serverSearchButton.onClick.AddListener();
@@ -153,12 +188,19 @@ public class MenuManager : MonoBehaviour
         hostGameButton.onClick.AddListener(HostGameHostButton);
         hostGameStartButton.onClick.AddListener(HostLobbyStartButton);
         hostGameBackButton.onClick.AddListener(LobbyHostBack);
+        hostGameSwapButton.onClick.AddListener(StartSwap);
+        hostGameKickButton.onClick.AddListener(StartKick);
+        hostGameBanButton.onClick.AddListener(StartBan);
+        hostGameConfirmButton.onClick.AddListener(ConfirmLobbyHostAction);
+        hostGameCancelButton.onClick.AddListener(CancelLobbyHostAction);
 
-        //GameObject.Find("").GetComponent<Button>().onClick.AddListener();
 
-        //TODO
-        //Add Rest of the UI buttons here
-    }
+
+    //GameObject.Find("").GetComponent<Button>().onClick.AddListener();
+
+    //TODO
+    //Add Rest of the UI buttons here
+}
 
 
 
@@ -172,13 +214,11 @@ public class MenuManager : MonoBehaviour
     public void LobbyHostBack()
     {
         networkManager.LeaveHostLobby();
-        menuStates.Back();
     }
 
     public void LobbyBack()
     {
         networkManager.LeaveLobby();
-        menuStates.Back();
     }
 
     public void QuickPlayButton()
@@ -188,8 +228,8 @@ public class MenuManager : MonoBehaviour
 
     public void FindGameButton()
     {
-        Debug.LogWarning("DIIING");
         menuStates.OpenBrowser();
+        networkManager.StartMatchMaker();
     }
 
     public void SettingsButton()
@@ -221,26 +261,25 @@ public class MenuManager : MonoBehaviour
     {
         networkManager.JoinMatch();
     }
-
-    public void PasswordEntryField(string password)
-    {
-        networkManager.SetJoinPassword(password);
-    }
     
     public void PasswordConfirmButton()
     {
-        networkManager.SetPasswordEntered(true);
+        string password = passwordInputField.text;
+        passwordInputField.text = "";
+
+        networkManager.EnterPassword(password);
+    }
+
+    public void PasswordCancelButton()
+    {
+        passwordInputField.text = "";
+
+        menuStates.Back();
     }
     
     public void ServerSearchConfrimButton()
     {
         menuStates.SearchServers();
-    }
-    
-    public void PasswordJoinButton()
-    {
-        passwordInputField.text = "";
-        networkManager.SetPasswordEntered(true);
     }
     
     public void HostGameHostButton()
@@ -281,6 +320,31 @@ public class MenuManager : MonoBehaviour
     }
 
     public void LobbyReadyButton()
+    {
+
+    }
+
+    public void StartSwap()
+    {
+
+    }
+
+    public void StartKick()
+    {
+
+    }
+
+    public void StartBan()
+    {
+
+    }
+
+    public void ConfirmLobbyHostAction()
+    {
+
+    }
+
+    public void CancelLobbyHostAction()
     {
 
     }

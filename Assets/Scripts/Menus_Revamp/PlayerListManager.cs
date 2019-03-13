@@ -1,21 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerListManager : MonoBehaviour
 {
-    private Transform playerList;
     private bool teams;
 
     // Start is called before the first frame update
     void Start()
-    {
-        playerList = transform.Find("PlayerList");
-    }
-
-    // Update is called once per frame
-    void Update()
     {
         
     }
@@ -24,21 +18,21 @@ public class PlayerListManager : MonoBehaviour
     {
         for (int loop = 0; loop < 12; loop++)
         {
-            Text name = playerList.Find("player" + loop).Find("Name").GetComponent<Text>();
+            Text name = transform.Find("PlayerList").Find("player" + loop).Find("Name").GetComponent<Text>();
             name.text = "";
         }
     }
 
-    public void UpdatePlayerList(List<string> players, string host)
+    public void UpdatePlayerList(List<string> players, int hostNum)
     {
         ClearPlayerList();
         
         for(int loop = 0; loop < players.Count; loop++)
         {
-            Text name = playerList.Find("player" + loop).Find("Name").GetComponent<Text>();
+            Text name = transform.Find("PlayerList").Find("player" + loop).Find("Name").GetComponent<Text>();
             string displayName = players[loop];
 
-            if(players[loop].Equals(host))
+            if(loop == hostNum)
             {
                 displayName += " *";
             }
@@ -50,6 +44,6 @@ public class PlayerListManager : MonoBehaviour
     public void ToggleTeams(bool teams)
     {
         this.teams = teams;
-        playerList.Find("TeamLabels").gameObject.active = teams;
+        transform.Find("PlayerList").Find("TeamLabels").gameObject.active = teams;
     }
 }

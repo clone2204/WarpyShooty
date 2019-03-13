@@ -226,3 +226,4 @@ c6666661329916e218bee7f5e79e60f5 Unity.TextMeshPro.dll:TMPro.TextMeshPro
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.LevelServerCommands
 cbc7ac08137cb9d34d22e0c22d379419 Assembly-CSharp.dll:.ProjectileGunBase
 83dffc789cd416ac4ef1fc44f3423e35 Assembly-CSharp-firstpass.dll:UnityStandardAssets.ImageEffects.Tonemapping
+71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.ErrorMessageManager

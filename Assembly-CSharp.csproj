@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ErrorMessageManager.cs" />
     <Compile Include="Assets\LobbyUIManager.cs" />
     <Compile Include="Assets\Scripts\GunBase.cs" />
     <Compile Include="Assets\Scripts\GunContainer.cs" />
@@ -70,26 +71,16 @@
     <Compile Include="Assets\Scripts\MatchInfoContainer.cs" />
     <Compile Include="Assets\Scripts\MatchManager.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\ILobbyManager.cs" />
+    <Compile Include="Assets\Scripts\Menus_Revamp\LobbyHostActions.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\LobbyManager.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\LobbyManager_Client.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\LobbyManager_Server.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\MenuManager.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\MenuStates.cs" />
+    <Compile Include="Assets\Scripts\Menus_Revamp\MenuStateManager.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\PlayerListManager.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\SearchServersState.cs" />
     <Compile Include="Assets\Scripts\Menus_Revamp\ServerBrowser.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\EnterPasswordState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\ErrorMessageState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\IngameMenuState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\IngameSettingsState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\IngameState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\LobbyState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\MainMenuState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\SearchServersState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\ServerBrowserState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\SettingsState.cs" />
-    <Compile Include="Assets\Scripts\Menus_Revamp\States\State.cs" />
     <Compile Include="Assets\Scripts\ObserverCamera.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\PlayerController\IPlayerInfoManager.cs" />

@@ -24,7 +24,6 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 
     public void Init(ILobbyManager lobbyManager)
     {
-        Debug.LogWarning("Server Init");
         players = new Dictionary<int, PlayerInfoManager>();
         clientProxy = (LobbyManager)lobbyManager;
 
@@ -109,17 +108,20 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 
     private void RequestUpdatePlayerList()
     {
-        Debug.LogWarning("Request Player List Update");
+        Debug.Log("Request Player List Update");
 
         string[] playerList = new string[players.Count];
         List<PlayerInfoManager> temp = new List<PlayerInfoManager>(players.Values);
 
+        int hostNum = 0;
         for (int loop = 0; loop < players.Count; loop++)
         {
             playerList[loop] = temp[loop].GetName();
+
+            if (temp[loop].GetPlayerID() == hostID)
+                hostNum = loop;
         }
 
-        Debug.LogWarning(playerList.Length);
-        clientProxy.RpcUpdatePlayerList(playerList, players[hostID].GetName());
+        clientProxy.RpcUpdatePlayerList(playerList, hostNum);
     }
 }

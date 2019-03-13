@@ -32,7 +32,7 @@ public class ServerBrowser : MonoBehaviour
             GameObject newServer = (GameObject)Instantiate<GameObject>(transform.Find("ServerEntry").gameObject);
 
             newServer.transform.Find("Name").GetComponent<Text>().text = serverInfo.name;
-            newServer.transform.Find("Size").GetComponent<Text>().text = serverInfo.currentSize + " / 12";
+            newServer.transform.Find("Size").GetComponent<Text>().text = serverInfo.currentSize + " / " + serverInfo.maxSize;
             newServer.transform.Find("Pass").GetComponent<Text>().text = (serverInfo.isPrivate == true ? "T" : "F");
 
             newServer.GetComponent<MatchInfoContainer>().matchInfo = serverInfo;
@@ -70,6 +70,8 @@ public class ServerBrowser : MonoBehaviour
         }
 
         serverEntries.Clear();
+
+        GameObject.Find("JoinServerButton").GetComponent<Button>().interactable = false;
     }
 
     public void ClearServerEntries()

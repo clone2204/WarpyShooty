@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class LobbyManager : NetworkBehaviour, ILobbyManager
 {
@@ -17,28 +18,30 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
 
         beenInitialized = false;
         realLobbyManager = null;
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    // Update is called once per frame
-    void Update() {
-
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "TitleScreen")
+        {
+            listManager = GameObject.Find("LobbyCanvas").GetComponent<PlayerListManager>();
+        }
     }
 
     public void Init(ILobbyManager lobbyManager = null)
     {
-        Debug.LogWarning("Client INIT: " + gameObject.GetComponent<NetworkIdentity>().netId);
         listManager = GameObject.Find("HostLobbyCanvas").GetComponent<PlayerListManager>();
 
         realLobbyManager = gameObject.GetComponent<LobbyManager_Server>();
         realLobbyManager.Init(this);
-        Debug.LogWarning("lobbyManager: " + realLobbyManager);
-
+        
         beenInitialized = true;
     }
 
     public void Clear()
     {
-        Debug.LogWarning("CLEAR");
         beenInitialized = false;
 
         if (realLobbyManager == null) return;
@@ -48,9 +51,7 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
     }
 
     public void AddPlayer(NetworkConnection playerConnection, short controllerID)
-    {
-        Debug.LogWarning("AddPlayer to: " + realLobbyManager);
-        
+    {       
         realLobbyManager.AddPlayer(playerConnection, controllerID);        
     }
 
@@ -80,12 +81,12 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
     }
 
     [ClientRpc]
-    public void RpcUpdatePlayerList(string[] players, string host)
+    public void RpcUpdatePlayerList(string[] players, int hostNum)
     {
-        Debug.LogWarning("Client Update Player List");
+        Debug.Log("Client Update Player List");
 
         List<string> playerList = new List<string>(players);
-        listManager.UpdatePlayerList(playerList, host);
+        listManager.UpdatePlayerList(playerList, hostNum);
     }
 
 }

@@ -14,8 +14,6 @@ public class PlayerInfoManager : NetworkBehaviour, IPlayerInfoManager
 
     void Start()
     {
-        Debug.LogWarning("Player INIT!");
-
         if (isServer)
         {
             realInfoManager = gameObject.GetComponent<PlayerInfoManager_Server>();

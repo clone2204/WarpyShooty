@@ -111,8 +111,8 @@ MonoBehaviour:
     y: 30
     width: 1600
     height: 767
-  m_MinSize: {x: 683, y: 348}
-  m_MaxSize: {x: 12008, y: 8048}
+  m_MinSize: {x: 681, y: 348}
+  m_MaxSize: {x: 12006, y: 8048}
   vertical: 0
   controlID: 98
 --- !u!114 &6
@@ -184,8 +184,8 @@ MonoBehaviour:
     y: 0
     width: 202
     height: 516
-  m_MinSize: {x: 202, y: 224}
-  m_MaxSize: {x: 4002, y: 4024}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -264,14 +264,14 @@ MonoBehaviour:
     y: 0
     width: 325
     height: 767
-  m_MinSize: {x: 277, y: 74}
-  m_MaxSize: {x: 4002, y: 4024}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
   - {fileID: 12}
   m_Selected: 0
-  m_LastSelected: 0
+  m_LastSelected: 1
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -292,18 +292,22 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1277
-    y: 92
+    x: 1275
+    y: 73
     width: 323
-    height: 746
+    height: 747
   m_PersistentViewDataDictionary: {fileID: 0}
-  m_InitialOpenURL: https://public-cdn.cloud.unity3d.com/editor/5.4/production/cloud/hub
+  m_InitialOpenURL: https://public-cdn.cloud.unity3d.com/editor/production/cloud/unet
   m_GlobalObjectTypeName: 
   m_RegisteredViewURLs:
   - https://public-cdn.cloud.unity3d.com/editor/5.4/production/cloud/hub
   - https://public-cdn.cloud.unity3d.com/editor/5.4/production/cloud/unet
   - file://C:/Users/Will/AppData/Roaming/Unity/Packages/node_modules/unityeditor-cloud-hub/dist/index.html?failure=unity_connect
+  - https://public-cdn.cloud.unity3d.com/editor/production/cloud/hub
+  - https://public-cdn.cloud.unity3d.com/editor/production/cloud/unet
   m_RegisteredViewInstances:
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -345,20 +349,20 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scenes
+    - Assets/Scripts/Menus_Revamp
   m_ViewMode: 1
   m_StartGridSize: 96
   m_LastFolders:
-  - Assets/Scenes
+  - Assets/Scripts/Menus_Revamp
   m_LastFoldersGridSize: 96
   m_LastProjectPath: E:\Will's_Good_Storage_Space\Shooty
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 620c0000
-    m_LastClickedID: 3170
-    m_ExpandedIDs: 00000000e60a00007e0b0000820c000000ca9a3b
+    scrollPos: {x: 0, y: 10}
+    m_SelectedIDs: fc0b0000
+    m_LastClickedID: 3068
+    m_ExpandedIDs: 00000000640b0000fc0b0000000d000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -386,7 +390,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000e60a00007e0b0000820c0000
+    m_ExpandedIDs: 00000000640b0000fc0b0000000d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -411,8 +415,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 8c520800
-    m_LastClickedInstanceID: 545420
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 382e000016230000302f00006823000024220000fa210000500500001c2200000022000000000000f022000006230000
     m_RenameOverlay:
@@ -472,21 +476,21 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: c4cafdffdecafdff8ad2fdff30d6fdff3cd6fdff4cd8fdff66d8fdff12e0fdffb8e3fdffc4e3fdffcee5fdffe8e5fdff94edfdff3af1fdff46f1fdff68f3fdff82f3fdff2efbfdffd4fefdffe0fefdffac00feffc600feff7208feff180cfeff240cfefff40dfeff0e0efeffba15feff6019feff6c19feff1c1bfeff361bfeffe222feff8826feff9426feff3628feff5028fefffc2ffeffa233feffb233feffdc37fefff637feffa23ffeff4843feff5443feff6a44feff8444feff304cfeffd64ffeffe24ffeff5051feff6a51feff1659feffbc5cfeffc85cfeffe25efefffc5efeffa866feff4e6afeff5a6afeff7eb9feff32c4feff20f8feff3af8feffe8fffeff8e03ffff9a03ffff4a08ffff6408ffff1210ffffb813ffffc413ffff2e16ffff4816fffff61dffff9c21ffffa821ffff0a23ffff2423ffffd22affff782effff842effffae3effff9256ffffac56ffff5a5effff0062ffff0c62ffff06b8ffff20b8ffff86c2ffff5cc6ffffb8c8ffff9accffffb4ccffff62d4ffff08d8ffff14d8ffff78d9ffff92d9ffff40e1ffffe6e4fffff2e4ffffd0e7ffffeae7ffff98efffff3ef3ffff4ef3ffffd4fbfffff4ffffff240f0000ca100000ae110000fe110000ae810100ec860100dc8901004c51050066750600b87c06008c520800ca570800ba5a0800c6170a00181f0a00
+      m_ExpandedIDs: 48bcfdff62bcfdff10c4fdffb6c7fdffc2c7fdff88cefdffa2cefdff50d6fdfff6d9fdff02dafdffd2ddfdffecddfdff52e8fdff28ecfdff84eefdffea00feff0401feffb208feff580cfeff640cfeff940efeffae0efeff5c16feff021afeff0e1afeffa01bfeffba1bfeff6823feff0e27feff1a27feff862afeffa02afeff4e32fefff435feff0036feff0438feff1e38feffcc3ffeff7243feff7e43feffa84dfeffc24dfeff7055feff1659feff2259feff3c6bfeff566bfeff0473feffaa76feffb676feffcc80feffe680feff9488feff3a8cfeff468cfeff9a90feffb490feff1a9bfefff09efeff4ca1feffb2a3feffcca3feff7aabfeff20affeff2caffeff26b1feff40b1feffeeb8feff94bcfeffa0bcfeff92c1feffacc1feff5ac9feff00cdfeff0ccdfeffc0cdfeffdacdfeff88d5feff2ed9feff3ad9feff6adcfeff84dcfeff32e4feffd8e7feffe4e7feff5aecfeff74ecfeff22f4feffc8f7feffd4f7feff24f9feff3ef9feffec00ffff9204ffff9e04ffff7005ffff8a05ffff380dffffde10ffffea10ffffec12ffff0613ffffb41affff5a1effff661effff6020ffff7a20ffffa426ffff462affff522affff982affffb22affff6032ffff0636ffff1236ffff4c38ffff6638ffff1440ffffba43ffffc643ffff4646ffff6046ffff0e4effffb451ffffc051ffff6056ffff7257ffff8c57ffff3a5fffffe062ffffec62ffff3264ffff4465ffff5e65ffff0c6dffffb270ffffbe70fffff472ffff0e73ffffbc7affff627effff6e7effffce81ffffe881ffff9689ffff3c8dffff488dfffff0a0ffff0aa1ffffb8a8ffff5eacffff6aacffff74b9ffff8eb9ffff3cc1ffffe2c4ffffeec4ffffa0c7ffffbac7ffff68cfffff0ed3ffff1ad3ffff9ad6ffffacd7ffffc6d7ffff74dfffff1ae3ffff26e3ffff3ae5ffff54e5ffffbaefffff90f3ffffecf5ffffbafbfffff4ffffff30aa000072aa00003caf000066c90000a8c9000072ce00000e2d010046d501004a0003008c000300fc050300223503003235030064350300d43a0300585403009a54030000b8030094d505001cc4080070c50800
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: _SCRIPTS_
-        m_OriginalName: _SCRIPTS_
+        m_Name: 
+        m_OriginalName: 
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 98734
+        m_UserData: 0
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 0
+        m_OriginalEventType: 11
         m_IsRenamingFilename: 0
         m_ClientGUIView: {fileID: 8}
       m_SearchString: 
@@ -561,9 +565,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0.07631194, y: -0.014594539, z: -0.0011175914, w: -0.99697655}
   m_Size:
-    m_Target: 1444.6667
+    m_Target: 1881.3319
     speed: 2
-    m_Value: 1444.6667
+    m_Value: 1881.3319
   m_Ortho:
     m_Target: 0
     speed: 2

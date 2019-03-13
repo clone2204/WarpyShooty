@@ -31,7 +31,7 @@ public class PlayerInfoManager_Server : NetworkBehaviour, IPlayerInfoManager
 
     public void SetName(string name)
     {
-        Debug.LogWarning("Set Name: " + name);
+        Debug.Log("Set Name: " + name);
         this.playerName = name;
     }
 
