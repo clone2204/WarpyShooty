@@ -26,11 +26,13 @@ public class PlayerListManager : MonoBehaviour
     public void UpdatePlayerList(List<string> players)
     {
         ClearPlayerList();
-        
+
+        Debug.Log("Updating Player List...");
         for(int loop = 0; loop < players.Count; loop++)
         {
             Text name = transform.Find("PlayerList").Find("player" + loop).Find("Name").GetComponent<Text>();
             string displayName = players[loop];
+            Debug.LogWarning(displayName);
 
             if(loop == 0)
             {

@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerInfoManager_Server : NetworkBehaviour, IPlayerInfoManager
+public class PlayerManager_Server : NetworkBehaviour, IPlayerManager
 {
-    private PlayerInfoManager_Client client;
+    private PlayerManager clientProxy;
 
     [SyncVar] private string playerName;
-    //Team here
+    [SyncVar] private GameManager.Team team;
 
     [SyncVar] public NetworkInstanceId playerObjectID;
     public NetworkConnection playerConnection;
 
-    public void Init(IPlayerInfoManager playerInfoManager)
+    public void Init(IPlayerManager playerInfoManager)
     {
-        client = (PlayerInfoManager_Client)playerInfoManager;
+        clientProxy = (PlayerManager)playerInfoManager;
     }
 
     public void SetName(string name)
@@ -23,16 +23,20 @@ public class PlayerInfoManager_Server : NetworkBehaviour, IPlayerInfoManager
         Debug.Log("Set Name: " + name);
         this.playerName = name;
     }
-
-    [Command]
-    public void CmdSetName(string name)
-    {
-        SetName(name);
-    }
-
+    
     public string GetName()
     {
         return playerName;
+    }
+
+    public void SetTeam(GameManager.Team team)
+    {
+        this.team = team;
+    }
+
+    public GameManager.Team GetTeam()
+    {
+        return this.team;
     }
 
     public void SetPlayerObjectID(NetworkInstanceId playerObjectID)
@@ -53,5 +57,10 @@ public class PlayerInfoManager_Server : NetworkBehaviour, IPlayerInfoManager
     public NetworkConnection GetPlayerConnection()
     {
         return this.playerConnection;
+    }
+
+    public void SpawnPlayer()
+    {
+
     }
 }

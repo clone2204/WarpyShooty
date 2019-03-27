@@ -2,7 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class PlayerHUDManager : MonoBehaviour {
+public class PlayerHUDManager : MonoBehaviour
+{
 
     ArrayList textElements;
 

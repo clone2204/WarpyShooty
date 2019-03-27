@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -30,12 +31,12 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
         }
     }
 
-    public void Init(ILobbyManager lobbyManager = null)
+    public void Init()
     {
         listManager = GameObject.Find("HostLobbyCanvas").GetComponent<PlayerListManager>();
 
         realLobbyManager = gameObject.GetComponent<LobbyManager_Server>();
-        realLobbyManager.Init(this);
+        realLobbyManager.Init();
         
         beenInitialized = true;
     }
@@ -51,29 +52,68 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
     }
 
     public void AddPlayer(NetworkConnection playerConnection, short controllerID)
-    {       
+    {
+        if (!isServer)
+            return;
+
         realLobbyManager.AddPlayer(playerConnection, controllerID);        
     }
 
     public void RemovePlayer(NetworkConnection playerConnection)
     {
+        if (!isServer)
+            return;
+
         realLobbyManager.RemovePlayer(playerConnection);
     }
 
     public void BanPlayers(List<int> players)
     {
+        if (!isServer)
+            return;
+
         realLobbyManager.BanPlayers(players);
     }
 
     public void KickPlayers(List<int> players)
     {
+        if (!isServer)
+            return;
+
         realLobbyManager.KickPlayers(players);
     }
 
     
     public void SwapPlayers(List<int> players)
     {
+        if (!isServer)
+            return;
+
         realLobbyManager.SwapPlayers(players);
+    }
+
+    public void ChangeGameSettings(int timeLimit, int killLimit)
+    {
+        if (!isServer)
+            return;
+
+        realLobbyManager.ChangeGameSettings(timeLimit, killLimit);
+    }
+
+    public void StartGame()
+    {
+        if (!isServer)
+            return;
+
+        realLobbyManager.StartGame();
+    }
+
+    public void PlayerLoaded(PlayerManager player)
+    {
+        if (!isServer)
+            return;
+
+        realLobbyManager.PlayerLoaded(player);
     }
 
     public bool GetBeenInitialized()
@@ -87,7 +127,19 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
         Debug.Log("Client Update Player List");
 
         List<string> playerList = new List<string>(players);
+        
         listManager.UpdatePlayerList(playerList);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateGameSettings(int timeLimit, int killLimit)
+    {
+        if (isServer)
+            return;
+
+        Transform lobbySettings = GameObject.Find("LobbyCanvas").transform.Find("ViewLobbySettings");
+        lobbySettings.Find("TimeLimit").GetComponent<Text>().text = "Time Limit: " + timeLimit;
+        lobbySettings.Find("KillLimit").GetComponent<Text>().text = "Kill Limit: " + killLimit;
     }
 
 }

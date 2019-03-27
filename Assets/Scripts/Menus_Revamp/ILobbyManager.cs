@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public interface ILobbyManager
 {
-    void Init(ILobbyManager lobbyManager);
+    void Init();
 
     void Clear();
 
@@ -18,4 +18,10 @@ public interface ILobbyManager
     void KickPlayers(List<int> players);
 
     void BanPlayers(List<int> players);
+
+    void ChangeGameSettings(int timeLimit, int killLimit);
+
+    void StartGame();
+
+    void PlayerLoaded(PlayerManager player);
 }

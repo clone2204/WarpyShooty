@@ -4,26 +4,19 @@ using System.Collections;
 
 public class LocalPlayerController : NetworkBehaviour
 {
+    private IPlayerManager infoManager;
 
-    GameObject player;
-    Rigidbody physics;
-    ConstantForce forces;
+    private CharacterController characterController;
 
-    private Warp_Proxy warpManager;
-
-    private IPlayerInfoManager infoManager;
-    private PlayerHUDManager hudManager;
+    private Warp warpManager;
     private GunManager gunManager;
 
-    public float gravity;
-    public float playerSpeed;
-    public float jumpPower;
+    [SerializeField] private float playerSpeed;
+    [SerializeField] private float jumpSpeed;
+    [SerializeField] private float gravity;
 
-    public int jumps;
+    [SerializeField] private int jumps;
     private int jumpsLeft;
-
-    private bool canJump;
-    private Vector3 jumpVector;
 
     // Use this for initialization
 	void Start ()
@@ -35,29 +28,14 @@ public class LocalPlayerController : NetworkBehaviour
             return;
         }
 
-        physics = GetComponent <Rigidbody>();
-        forces = GetComponent<ConstantForce>();
+        infoManager = GetComponent<IPlayerManager>();
 
-        warpManager = GetComponent<Warp_Proxy>();
+        characterController = GetComponent<CharacterController>();
 
-        infoManager = GetComponent<IPlayerInfoManager>();
-        hudManager = GetComponentInChildren<PlayerHUDManager>();
+        warpManager = GetComponent<Warp>();
         gunManager = GetComponent<GunManager>();
 
         jumpsLeft = jumps;
-
-        OnStartLocalPlayer();
-    }
-
-    public override void OnStartLocalPlayer()
-    {
-        Debug.Log("LOCAL PLAYER SETTUP");
-
-        //GetComponent<Warp>().enabled = true;
-        GetComponentInChildren<Camera>().enabled = true;
-        this.tag = "localPlayer";
-
-        GetComponentInChildren<MeshRenderer>().material.color = Color.green;
     }
 
     // Update is called once per frame
@@ -66,20 +44,6 @@ public class LocalPlayerController : NetworkBehaviour
         KeyboardInput();
         MouseMovement();
     }
-
-    void FixedUpdate()
-    {
-        if (canJump)
-        {
-            physics.AddForce(new Vector3(0, -500, 0), ForceMode.Acceleration);
-        }
-        else
-        {
-            physics.AddForce(new Vector3(0, gravity, 0), ForceMode.Acceleration);
-        }
-    }
-
-    private Vector3 tempJumpVector;
 
     private void KeyboardInput()
     {
@@ -121,68 +85,47 @@ public class LocalPlayerController : NetworkBehaviour
 
     }
 
+    private Vector3 moveDirection = Vector3.zero;
     private void KeyboardMovement()
     {
         float newX = 0;
         float newZ = 0;
 
-
         float xrot = Mathf.Sin(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y);
         float zrot = Mathf.Cos(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y);
 
-        float currentX = physics.velocity.x;
-        float currentZ = physics.velocity.z;
-
         if (Input.GetKey("w"))
         {
-            newX += playerSpeed * xrot;
-            newZ += playerSpeed * zrot;
+            newX += xrot;
+            newZ += zrot;
         }
         if (Input.GetKey("s"))
         {
-            newX += -playerSpeed * xrot;
-            newZ += -playerSpeed * zrot;
+            newX -= xrot;
+            newZ -= zrot;
         }
         if (Input.GetKey("a"))
         {
-            newX += -playerSpeed * zrot;
-            newZ += playerSpeed * xrot;
+            newX -= zrot;
+            newZ += xrot;
         }
         if (Input.GetKey("d"))
         {
-            newX += playerSpeed * zrot;
-            newZ += -playerSpeed * xrot;
+            newX += zrot;
+            newZ -= xrot;
         }
 
-        
-        if (Input.GetKeyDown("space") && canJump)
-        {
-            physics.velocity += new Vector3(0, jumpPower, 0);
-            canJump = false;
-        }
-        
-        //Canjump == true means the player is on the ground
-        if(canJump)
-        {
-            jumpVector = new Vector3(0, 0, 0);
-            physics.velocity = new Vector3(newX, physics.velocity.y, newZ);
-        }
-        else
-        {
-            if (newX == 0 && newZ == 0)
-            {
-                physics.velocity = jumpVector + new Vector3(0, physics.velocity.y, 0);
-            }
-            else
-            {
-                physics.velocity = new Vector3(newX / 2, physics.velocity.y, newZ / 2);
-                jumpVector = new Vector3(newX, 0, newZ) / 4;
+        moveDirection = new Vector3(newX, 0, newZ);
+        moveDirection *= playerSpeed;
 
-            }
+        moveDirection.y -= (gravity * Time.deltaTime);
+        
+        if (Input.GetKeyDown("space") && characterController.isGrounded)
+        {
+            moveDirection.y = jumpSpeed;
         }
 
-        
-        
+        characterController.Move(moveDirection * Time.deltaTime);
     }
 
     private void MouseMovement()
@@ -208,29 +151,4 @@ public class LocalPlayerController : NetworkBehaviour
         }
 
     }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if(other.tag == "GROUND")
-        {
-            canJump = true;
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if(other.tag == "GROUND")
-        {
-            canJump = false;
-        }
-    }
-
-    void OnTriggerStay(Collider other)
-    {
-        if(other.tag == "GROUND")
-        {
-            canJump = true;
-        }
-    }
-
 }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class ServerHitDetection : NetworkBehaviour
 {
     ILobbyManager lobbyManager;
-    IPlayerInfoManager playerInfoManager;
+    IPlayerManager playerInfoManager;
     PlayerHUDManager playerHUD;
     GunManager gunManager;
 
@@ -24,7 +24,7 @@ public class ServerHitDetection : NetworkBehaviour
         }
         
         lobbyManager = GameObject.Find("_SCRIPTS_").GetComponent<ILobbyManager>();
-        playerInfoManager = GetComponent<IPlayerInfoManager>();
+        playerInfoManager = GetComponent<IPlayerManager>();
         playerHUD = transform.Find("PlayerHud").GetComponent<PlayerHUDManager>();
         gunManager = GetComponent<GunManager>();
         

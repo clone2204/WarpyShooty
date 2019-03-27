@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 using System.Collections;
 using System;
 
-public class Warp_Server : NetworkBehaviour, Warp
+public class Warp_Server : NetworkBehaviour, IWarp
 {
     
     // Use this for initialization
@@ -18,40 +18,40 @@ public class Warp_Server : NetworkBehaviour, Warp
 
     public void WarpPlayer()
     {
-        WarpLocations.Location playerLocation = WarpLocations.GetLocation(transform);
-        WarpLocations.Location warpLocation;
+        Warp.Location playerLocation = Warp.GetLocation(transform);
+        Warp.Location warpLocation;
 
-        if(playerLocation == WarpLocations.Location.Blue)
+        if(playerLocation == Warp.Location.Blue)
         {
-            warpLocation = WarpLocations.Location.Red;
+            warpLocation = Warp.Location.Red;
         }
-        else if(playerLocation == WarpLocations.Location.Red)
+        else if(playerLocation == Warp.Location.Red)
         {
-            warpLocation = WarpLocations.Location.Blue;
+            warpLocation = Warp.Location.Blue;
         }
         else
         {
-            warpLocation = WarpLocations.Location.NONE;
+            warpLocation = Warp.Location.NONE;
         }
 
         Debug.Log("Warp Player To: " + warpLocation.ToString());
         WarpPlayerToLocation(warpLocation);
     }
     
-    public void WarpPlayerToLocation(WarpLocations.Location location)
+    public void WarpPlayerToLocation(Warp.Location location)
     {
         int warpOffset = 2000;
         float xCoord = transform.position.x;
         float zCoord = transform.position.z;
 
-        if (WarpLocations.GetLocation(transform) == location || location == WarpLocations.Location.NONE)
+        if (Warp.GetLocation(transform) == location || location == Warp.Location.NONE)
             return;
 
-        if (location == WarpLocations.Location.Blue)
+        if (location == Warp.Location.Blue)
         {
             xCoord -= warpOffset;
         }
-        else if (location == WarpLocations.Location.Red)
+        else if (location == Warp.Location.Red)
         {
             xCoord += warpOffset;
         }

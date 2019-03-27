@@ -1,12 +1,16 @@
 ﻿using UnityEngine.Networking;
 
-public interface IPlayerInfoManager
+public interface IPlayerManager
 {
-    void Init(IPlayerInfoManager playerInfoManager);
+    void Init(IPlayerManager playerInfoManager);
     
     void SetName(string name);
 
     string GetName();
+
+    void SetTeam(GameManager.Team team);
+
+    GameManager.Team GetTeam();
 
     void SetPlayerObjectID(NetworkInstanceId playerObjectID);
 
@@ -16,4 +20,5 @@ public interface IPlayerInfoManager
 
     NetworkConnection GetPlayerConnection();
 
+    void SpawnPlayer();
 }

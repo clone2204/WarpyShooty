@@ -9,9 +9,9 @@ public class ObserverCamera : MonoBehaviour
 
     Transform targetNavPoint;
     private int currentNavIndex;
-    private WarpLocations.Location currentLocation;
+    private Warp.Location currentLocation;
 
-    public WarpLocations.Location startLocation;
+    public Warp.Location startLocation;
     public float cameraSpeed;
 
     public bool playerControl;
@@ -99,18 +99,18 @@ public class ObserverCamera : MonoBehaviour
     {
         Transform cameraRotator = observerCam.transform.Find("CameraRotator");
 
-        int warpOffset = 2000;
+        int warpOffset = -2000;
         float xPos = cameraRotator.localPosition.x;
 
-        if (currentLocation == WarpLocations.Location.Blue)
+        if (currentLocation == Warp.Location.Blue)
         {
             xPos -= warpOffset;
-            currentLocation = WarpLocations.Location.Red;
+            currentLocation = Warp.Location.Red;
         }
-        else if (currentLocation == WarpLocations.Location.Red)
+        else if (currentLocation == Warp.Location.Red)
         {
             xPos += warpOffset;
-            currentLocation = WarpLocations.Location.Blue;
+            currentLocation = Warp.Location.Blue;
         }
 
         cameraRotator.localPosition = new Vector3(xPos, cameraRotator.localPosition.y, cameraRotator.localPosition.z);
