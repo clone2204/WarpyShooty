@@ -40,4 +40,9 @@ public class GameManager : NetworkBehaviour, IGameManager
 
         realGameManager.StartGame();
     }
+
+    public int GetGameTime()
+    {
+        return realGameManager.GetGameTime();
+    }
 }

@@ -6,13 +6,13 @@ using System.Collections.Generic;
 public class LevelServerCommands : NetworkBehaviour {
 
     private NetworkLobbyManager networkManager;
-    private MatchManager matchManager;
+   //rivate MatchManager matchManager;
     private List<GameObject> prefabList;
 
     public void Start()
     {
         this.networkManager = GetComponentInParent<NetworkLobbyManager>();
-        matchManager = GetComponentInParent<MatchManager>();
+        //tchManager = GetComponentInParent<MatchManager>();
         this.prefabList = this.networkManager.spawnPrefabs;
     }
 

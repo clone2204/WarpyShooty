@@ -47,7 +47,6 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 
     public void AddPlayer(NetworkConnection playerConnection, short controllerID)
     {
-        Debug.LogWarning("ADD PLAYER: " + playerConnection.connectionId);
         if(bannedPlayers.Contains(playerConnection.address))
         {
             StartCoroutine(WaitForConnection(playerConnection));
@@ -68,11 +67,10 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
     {
         GameObject player = playerConnection.playerControllers[controllerID].gameObject;
         PlayerManager playerInfo = player.GetComponent<PlayerManager>();
-        playerInfo.Init(null);
+        playerInfo.Init();
 
-        Debug.LogWarning("DING");
         yield return new WaitUntil(() => playerInfo.GetName() != null);
-        Debug.LogWarning("DANG");
+
         playerInfo.SetPlayerObjectID(player.GetComponent<NetworkIdentity>().netId);
         playerInfo.SetPlayerConnection(playerConnection);
 
@@ -177,7 +175,6 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
 
     public void StartGame()
     {
-        Debug.LogWarning("Game Manager: " + gameManager);
         gameManager.SetupGame(new List<PlayerManager>(this.players), this.gameTimeLimit, this.gameKillLimit);
 
         readyPlayers = new Dictionary<PlayerManager, bool>();
@@ -227,7 +224,6 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
             }
         }
 
-        Debug.LogWarning("CLIENT PROXY: " + clientProxy);
         clientProxy.RpcUpdatePlayerList(playerList);
         clientProxy.RpcUpdateGameSettings(this.gameTimeLimit, this.gameKillLimit);
     }

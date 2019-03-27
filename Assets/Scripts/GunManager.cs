@@ -173,7 +173,7 @@ public class GunManager : NetworkBehaviour
                 playerHud = this.GetComponentInChildren<Canvas>();
                 hudManager = playerHud.GetComponent<PlayerHUDManager>();
             }
-            hudManager.UpdateNewGunInfo(gun);
+            //hudManager.UpdateNewGunInfo(gun);
         }
             
 
@@ -203,7 +203,7 @@ public class GunManager : NetworkBehaviour
     
     public void ModifyCurrentAmmoCount(int currentAmmo, int maxAmmo)
     {
-        this.hudManager.getTextElementByName("Ammo Count").text = currentAmmo + " / " + maxAmmo;
+        //this.hudManager.getTextElementByName("Ammo Count").text = currentAmmo + " / " + maxAmmo;
     }
 
 
@@ -213,11 +213,11 @@ public class GunManager : NetworkBehaviour
         this.swapableGunContainer = gunContainer;
         if (gunContainer == null || gunContainer.GetComponent<GunContainer>().containedGun == null)
         {
-            this.hudManager.getTextElementByName("Player Interact").text = "";
+            //this.hudManager.getTextElementByName("Player Interact").text = "";
         }
         else
         {
-            this.hudManager.getTextElementByName("Player Interact").text = "Pickup " + this.swapableGunContainer.GetComponent<GunContainer>().containedGun.GetComponent<GunBase>().gunName;
+            //this.hudManager.getTextElementByName("Player Interact").text = "Pickup " + this.swapableGunContainer.GetComponent<GunContainer>().containedGun.GetComponent<GunBase>().gunName;
         }
     }
 

@@ -32,7 +32,6 @@ public class PlayerListManager : MonoBehaviour
         {
             Text name = transform.Find("PlayerList").Find("player" + loop).Find("Name").GetComponent<Text>();
             string displayName = players[loop];
-            Debug.LogWarning(displayName);
 
             if(loop == 0)
             {

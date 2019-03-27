@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class PlayerManager_Server : NetworkBehaviour, IPlayerManager
 {
@@ -13,9 +14,32 @@ public class PlayerManager_Server : NetworkBehaviour, IPlayerManager
     [SyncVar] public NetworkInstanceId playerObjectID;
     public NetworkConnection playerConnection;
 
-    public void Init(IPlayerManager playerInfoManager)
+    private GameObject playerObject;
+        
+    public void Init()
     {
-        clientProxy = (PlayerManager)playerInfoManager;
+        clientProxy = GetComponent<PlayerManager>();
+
+        Debug.LogWarning("DANDF");
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.LogWarning("Scene Loaded: " + scene.name);
+        if (scene.name != "TitleScreen")
+        {
+            foreach(GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                NetworkIdentity playerNetwork = player.GetComponent<NetworkIdentity>();
+
+                if(playerNetwork.Equals(playerConnection))
+                {
+                    Debug.LogWarning("DINGDING");
+                    playerObject = player;
+                }
+            }
+        }
     }
 
     public void SetName(string name)
@@ -59,8 +83,20 @@ public class PlayerManager_Server : NetworkBehaviour, IPlayerManager
         return this.playerConnection;
     }
 
-    public void SpawnPlayer()
+    public void SetPlayerObject(GameObject playerObject)
     {
+        Debug.LogWarning("SET PLAYER: " + playerObject);
+        this.playerObject = playerObject;
+    }
 
+    public GameObject GetPlayerObject()
+    {
+        return this.playerObject;
+    }
+
+    public void SpawnPlayer(Vector3 respawnPoint)
+    {
+        Debug.LogWarning("SPAWN PLAYER AT: " + respawnPoint);
+        playerObject.transform.position = respawnPoint;
     }
 }

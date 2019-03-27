@@ -109,8 +109,11 @@ public class NetworkManager : NetworkLobbyManager
 
     public void StartGame()
     {
-        lobbyManager.StartGame();
         CheckReadyToBegin();
+        base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+        matchOpen = false;
+
+        lobbyManager.StartGame();
     }
 
     public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
@@ -405,6 +408,13 @@ public class NetworkManager : NetworkLobbyManager
 
         menuStates.Disconnected("Disconnected.", conn.lastError.ToString());
 
+    }
+
+    private void OnApplicationQuit()
+    {
+        NetworkServer.DisconnectAll();
+        base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+        StopHost();
     }
     #endregion
 }

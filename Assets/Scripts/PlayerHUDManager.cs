@@ -1,70 +1,53 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 using System.Collections;
 
 public class PlayerHUDManager : MonoBehaviour
 {
+    private GameManager gameManager;
+    private PlayerManager playerManager;
 
-    ArrayList textElements;
-
-    Text gameTimer;
-
+    private Transform gameInfoHUD;
+    private Transform worldInfoHUD;
+    private Transform playerInfoHUD;
+    private Transform gunInfoHUD;
+    private Transform centerHUD;
+    
 	// Use this for initialization
 	void Start ()
     {
-        textElements = new ArrayList();
-        textElements.AddRange(this.GetComponentsInChildren<Text>());
+        gameInfoHUD = transform.Find("GameInfoHUD");
+        worldInfoHUD = transform.Find("WorldInfoHUD");
+        playerInfoHUD = transform.Find("PlayerInfoHUD");
+        gunInfoHUD = transform.Find("GunInfoHUD");
+        centerHUD = transform.Find("CenterHUD");
 
-        gameTimer = getTextElementByName("GameTimer");
+        gameManager = GameObject.Find("_SCRIPTS_").GetComponentInChildren<GameManager>();
+        playerManager = GameObject.FindGameObjectWithTag("localPlayer").GetComponent<PlayerManager>();
 
-        //UpdatePlayerName(GetComponentInParent<PlayerInfoManager>().playerInfo.playerName);
+
+        SetPlayerName(playerManager.GetName());
     }
-	
+
+   
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+        UpdateGameTime();   
 	}
 
-    public Text getTextElementByName(string name)
+    private void UpdateGameTime()
     {
-        if(textElements == null)
-        {
-            textElements = new ArrayList();
-            textElements.AddRange(this.GetComponentsInChildren<Text>());
-        }
+        Text gameTime = gameInfoHUD.Find("GameTimer").GetComponent<Text>();
+        int time = gameManager.GetGameTime();
 
-        foreach(Text element in textElements)
-        {
-            if (element.name == name)
-            {
-                return element;
-            }
-        }
-
-        
-        return null;
+        gameTime.text = "Time: " + (time / 60) + ":" + ((time % 60) < 10 ? "0" + (time % 60) : "" + (time % 60));
     }
 
-    private void UpdatePlayerName(string name)
+    public void SetPlayerName(string name)
     {
-        getTextElementByName("Player Name").text = name;
+        Text playerName = playerInfoHUD.Find("Player Name").GetComponent<Text>();
+        playerName.text = name;
     }
-
-    public void UpdateNewGunInfo(GameObject gun)
-    {
-        getTextElementByName("Gun Name").text = gun.GetComponent<GunBase>().gunName;
-        getTextElementByName("Ammo Count").text = gun.GetComponent<GunBase>().ammoData.currentAmmoCount + " / " + gun.GetComponent<GunBase>().ammoData.currentAmmoPoolCount;
-    }
-
-    public void UpdatePlayerHealthHUD(int health)
-    {
-        getTextElementByName("Player Health").text = "Health: " + health;
-        Debug.Log("HUD UPDATED");
-    }
-
-    public void UpdateGameTimer(int gameTime)
-    {
-        gameTimer.text = "" + gameTime;
-    }
-
 }

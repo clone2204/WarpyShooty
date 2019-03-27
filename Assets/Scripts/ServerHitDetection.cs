@@ -49,7 +49,7 @@ public class ServerHitDetection : NetworkBehaviour
     public void TargetUpdateClientDamage(NetworkConnection connection, int playerHealth)
     {
         Debug.Log("CLIENT DAMAGE UPDATE");
-        ClientScene.FindLocalObject(netId).GetComponentInChildren<PlayerHUDManager>().UpdatePlayerHealthHUD(playerHealth);
+
     }
 
     private IEnumerator RespawnCoroutine(float respawnTime)

@@ -1,8 +1,9 @@
-﻿using UnityEngine.Networking;
+﻿using UnityEngine;
+using UnityEngine.Networking;
 
 public interface IPlayerManager
 {
-    void Init(IPlayerManager playerInfoManager);
+    void Init();
     
     void SetName(string name);
 
@@ -20,5 +21,9 @@ public interface IPlayerManager
 
     NetworkConnection GetPlayerConnection();
 
-    void SpawnPlayer();
+    void SetPlayerObject(GameObject playerObject);
+
+    GameObject GetPlayerObject();
+
+    void SpawnPlayer(Vector3 location);
 }

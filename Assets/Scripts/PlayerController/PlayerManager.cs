@@ -2,34 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class PlayerManager : NetworkBehaviour, IPlayerManager
 {
     private IPlayerManager realInfoManager;
 
     private NetworkLobbyPlayer lobbyPlayer;
+    private PlayerHUDManager playerhud;
 
     void Start()
+    {
+        Init();
+    }
+
+    public void Init()
     {
         realInfoManager = gameObject.GetComponent<PlayerManager_Server>();
         lobbyPlayer = gameObject.GetComponent<NetworkLobbyPlayer>();
 
-        Debug.LogWarning("DING1");
+        realInfoManager.Init();
+
         if (isLocalPlayer)
         {
-            Debug.LogWarning("DANG1");
             gameObject.tag = "localPlayer";
 
             string name = GameObject.Find("_SCRIPTS_").GetComponent<SettingsManager>().GetPlayerName();
-            CmdSetName(name); 
+            CmdSetName(name);
         }
 
         lobbyPlayer.readyToBegin = true;
     }
 
-    public void Init(IPlayerManager playerInfoManager)
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Start();
+        Debug.Log("Scene Loaded: " + scene.name);
+        if (scene.name != "TitleScreen")
+        {
+            playerhud = GameObject.Find("PlayerHud").GetComponent<PlayerHUDManager>();
+        }
     }
 
     public void SetName(string name)
@@ -90,11 +101,24 @@ public class PlayerManager : NetworkBehaviour, IPlayerManager
         return realInfoManager.GetPlayerConnection();
     }
 
-    public void SpawnPlayer()
+    public void SetPlayerObject(GameObject playerObject)
     {
         if (!isServer)
             return;
 
-        realInfoManager.SpawnPlayer();
+        realInfoManager.SetPlayerObject(playerObject);
+    }
+
+    public GameObject GetPlayerObject()
+    {
+        return realInfoManager.GetPlayerObject();
+    }
+
+    public void SpawnPlayer(Vector3 respawnPoint)
+    {
+        if (!isServer)
+            return;
+
+        realInfoManager.SpawnPlayer(respawnPoint);
     }
 }
