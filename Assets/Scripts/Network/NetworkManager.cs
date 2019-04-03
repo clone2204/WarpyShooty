@@ -118,7 +118,7 @@ public class NetworkManager : NetworkLobbyManager
     public void StartGame()
     {
         CheckReadyToBegin();
-        base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+        //base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
         matchOpen = false;
 
         lobbyManager.StartGame();
@@ -146,7 +146,7 @@ public class NetworkManager : NetworkLobbyManager
 
         Debug.LogWarning("Attemp Match Destroy");
         NetworkServer.DisconnectAll();
-        base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+        //base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
 
         matchOpen = false;
         this.matchInfo = null;
@@ -183,8 +183,10 @@ public class NetworkManager : NetworkLobbyManager
         }
         else
         {
-            //StartClient();
-            base.client.Connect(matchContainer.lanAddress, 8080);
+            Debug.LogWarning("ADDRESS: " + matchContainer.lanAddress);
+            base.networkAddress = matchContainer.lanAddress;
+            StartClient();
+            //base.client.Connect(matchContainer.lanAddress, 8080);
 
             menuStates.EnterLobby();
         }
@@ -437,7 +439,7 @@ public class NetworkManager : NetworkLobbyManager
     private void OnApplicationQuit()
     {
         NetworkServer.DisconnectAll();
-        base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+        //base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
         StopHost();
     }
     #endregion

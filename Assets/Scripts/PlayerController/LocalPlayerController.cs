@@ -14,6 +14,7 @@ public class LocalPlayerController : NetworkBehaviour
     [SerializeField] private float playerSpeed;
     [SerializeField] private float jumpSpeed;
     [SerializeField] private float gravity;
+    [SerializeField] private float terminalVelocity;
 
     [SerializeField] private int jumps;
     private int jumpsLeft;
@@ -66,6 +67,10 @@ public class LocalPlayerController : NetworkBehaviour
         {
 
         }
+        if(Input.GetKeyDown("q"))
+        {
+            warpManager.WarpPlayer();
+        }
         if(Input.GetKeyDown(KeyCode.LeftShift))
         {
             warpManager.WarpPlayer();
@@ -86,6 +91,7 @@ public class LocalPlayerController : NetworkBehaviour
     }
 
     private Vector3 moveDirection = Vector3.zero;
+    private float verticalMovement = 0;
     private void KeyboardMovement()
     {
         float newX = 0;
@@ -118,11 +124,14 @@ public class LocalPlayerController : NetworkBehaviour
         moveDirection = new Vector3(newX, 0, newZ);
         moveDirection *= playerSpeed;
 
-        moveDirection.y -= (gravity * Time.deltaTime);
+        if (!characterController.isGrounded)
+            moveDirection *= .75f;
+
+        //moveDirection.y -= 
         
-        if (Input.GetKeyDown("space") && characterController.isGrounded)
+        if (Input.GetKey("space") && characterController.isGrounded)
         {
-            moveDirection.y = jumpSpeed;
+            verticalMovement = jumpSpeed;
         }
 
         characterController.Move(moveDirection * Time.deltaTime);
@@ -150,5 +159,27 @@ public class LocalPlayerController : NetworkBehaviour
             camera.transform.localRotation = Quaternion.Euler(Mathf.Asin(minViewAngle) * Mathf.Rad2Deg, 0, 0);
         }
 
+    }
+
+    private void FixedUpdate()
+    {
+        if (characterController.isGrounded)
+        {
+            verticalMovement = 0;
+            return;
+        }
+
+        characterController.Move(new Vector3(0, verticalMovement, 0) * Time.deltaTime);
+
+        if(-1 * (verticalMovement - gravity) < terminalVelocity)
+            verticalMovement -= gravity;
+    }
+
+
+    public float Gravity()
+    {
+
+
+        return 0f;
     }
 }
