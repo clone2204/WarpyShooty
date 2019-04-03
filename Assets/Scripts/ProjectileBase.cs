@@ -2,9 +2,9 @@
 using UnityEngine.Networking;
 using System.Collections;
 
-public class ProjectileBase : NetworkBehaviour {
+public class ProjectileBase : NetworkBehaviour
+{
 
-    private LevelServerCommands serverCommands;
     public ProjectileProperties properties;
 
     public struct ProjectileProperties
@@ -38,7 +38,7 @@ public class ProjectileBase : NetworkBehaviour {
     // Use this for initialization
     void Start()
     {
-        serverCommands = GameObject.Find("_SCRIPTS_").GetComponentInChildren<LevelServerCommands>();
+        //serverCommands = GameObject.Find("_SCRIPTS_").GetComponentInChildren<LevelServerCommands>();
 
         bulletPhysics = this.GetComponent<Rigidbody>();
         bulletPhysics.velocity = this.properties.spawnDirection * this.properties.velocity;
@@ -53,7 +53,7 @@ public class ProjectileBase : NetworkBehaviour {
         if ((other.gameObject.tag == "localPlayer" || other.gameObject.tag == "Player") && isServer)
         {
             //Debug.LogWarning("PLAYER " + other.gameObject.GetComponent<PlayerInfoManager>().playerInfo.playerName + " HIT on server: " + isServer);
-            other.gameObject.GetComponent<ServerHitDetection>().InflictDamageOnPlayer(this.properties.damage);
+            //other.gameObject.GetComponent<ServerHitDetection>().InflictDamageOnPlayer(this.properties.damage);
         }
         DestroyBulletInSeconds(0);
     }

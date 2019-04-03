@@ -12,7 +12,7 @@ public class GunContainer : NetworkBehaviour {
     // Use this for initialization
     void Start ()
     {
-        LevelServerCommands serverCommands = GameObject.Find("_SCRIPTS_").GetComponentInChildren<LevelServerCommands>();
+
     }
 	
 	// Update is called once per frame
