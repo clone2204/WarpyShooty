@@ -5,15 +5,11 @@ using System;
 
 public class Warp : NetworkBehaviour, IWarp
 {
-    private IWarp realWarp;
-
+    
     // Use this for initialization
     void Start ()
     {
-	    if(isServer)
-        {
-            realWarp = gameObject.AddComponent<Warp_Server>();
-        }
+	    
 	}
 	
 	// Update is called once per frame
@@ -22,41 +18,24 @@ public class Warp : NetworkBehaviour, IWarp
 	    
 	}
 
+    
+    //=================================================================================================
+    //Interface Functions
+    //=================================================================================================
+
     public void WarpPlayer()
     {
-        if (isServer)
-        {
-            realWarp.WarpPlayer();
-        }
-        else
-        {
-            CmdWarpPlayer();
-        }
+        CmdWarpPlayer();
     }
 
     public void WarpPlayerToLocation(Location location)
     {
-        if (isServer)
-        {
-            realWarp.WarpPlayerToLocation(location);
-        }
-        else
-        {
-            CmdWarpPlayerToLocation(location);
-        }
+        CmdWarpPlayerToLocation(location);
     }
 
-    [Command]
-    private void CmdWarpPlayer() 
-    {
-        WarpPlayer();
-    }
-
-    [Command]
-    private void CmdWarpPlayerToLocation(Location location)
-    {
-        WarpPlayerToLocation(location);
-    }
+    //=================================================================================================
+    //Helper Functions
+    //=================================================================================================
 
     public enum Location
     {
@@ -78,4 +57,57 @@ public class Warp : NetworkBehaviour, IWarp
 
         return Location.NONE;
     }
+
+    //=================================================================================================
+    //Server Functions
+    //=================================================================================================
+
+    [Command]
+    private void CmdWarpPlayer() 
+    {
+        Warp.Location playerLocation = Warp.GetLocation(transform);
+        Warp.Location warpLocation;
+
+        if (playerLocation == Warp.Location.Blue)
+        {
+            warpLocation = Warp.Location.Red;
+        }
+        else if (playerLocation == Warp.Location.Red)
+        {
+            warpLocation = Warp.Location.Blue;
+        }
+        else
+        {
+            warpLocation = Warp.Location.NONE;
+        }
+
+        WarpPlayerToLocation(warpLocation);
+    }
+
+    [Command]
+    private void CmdWarpPlayerToLocation(Location location)
+    {
+        int warpOffset = -2000;
+        float xCoord = transform.position.x;
+        float zCoord = transform.position.z;
+
+        if (Warp.GetLocation(transform) == location || location == Warp.Location.NONE)
+            return;
+
+        if (location == Warp.Location.Blue)
+        {
+            xCoord -= warpOffset;
+        }
+        else if (location == Warp.Location.Red)
+        {
+            xCoord += warpOffset;
+        }
+
+        transform.position = new Vector3(xCoord, transform.position.y, zCoord);
+    }
+
+    //=================================================================================================
+    //Client Functions
+    //=================================================================================================
+
 }

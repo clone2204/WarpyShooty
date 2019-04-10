@@ -63,6 +63,16 @@ public class PlayerHUDManager : MonoBehaviour
         playerInfoHUD.Find("Player Health").GetComponent<Text>().text = "Health: " + health;
     }
 
+    public void SetWeaponName(string name)
+    {
+        gunInfoHUD.Find("Gun Name").GetComponent<Text>().text = name;
+    }
+
+    public void SetWeaponAmmo(int ammo, int ammoPool)
+    {
+        gunInfoHUD.Find("Ammo Count").GetComponent<Text>().text = ammo + " / " + ammoPool;
+    }
+
     public void SetToPlayerView()
     {
         observerCamera.enabled = false;

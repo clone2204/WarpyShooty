@@ -4,11 +4,9 @@ using System.Collections;
 
 public class LocalPlayerController : NetworkBehaviour
 {
-    private LobbyPlayerManager infoManager;
-
     private CharacterController characterController;
+    private GamePlayerManager playerManager;
 
-    private Warp warpManager;
     private GunManager gunManager;
 
     [SerializeField] private float playerSpeed;
@@ -29,11 +27,9 @@ public class LocalPlayerController : NetworkBehaviour
             return;
         }
 
-        infoManager = GetComponent<LobbyPlayerManager>();
-
         characterController = GetComponent<CharacterController>();
+        playerManager = GetComponent<GamePlayerManager>();
 
-        warpManager = GetComponent<Warp>();
         gunManager = GetComponent<GunManager>();
 
         jumpsLeft = jumps;
@@ -55,44 +51,44 @@ public class LocalPlayerController : NetworkBehaviour
     {
         KeyboardMovement();
 
-        //Other Inputs
+        //Fire Control
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            playerManager.StartPrimaryFire();
+        }
+        if(Input.GetKeyUp(KeyCode.Mouse0))
+        {
+            playerManager.StopPrimaryFire();
+        }
+
+        if(Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            playerManager.StartAltFire();
+        }
+        if(Input.GetKeyUp(KeyCode.Mouse1))
+        {
+            playerManager.StopAltFire();
+        }
+
         if (Input.GetKeyDown("r"))
         {
-            this.gunManager.ReloadGun();
+            playerManager.StartReload();
         }
+        if(Input.GetKeyUp("r"))
+        {
+            playerManager.StopReload();
+        }
+
         if (Input.GetKeyDown("e"))
         {
-            this.gunManager.SwapGun();
-        }
-        if(Input.GetKeyDown("t"))
-        {
-            this.gunManager.SprayPlayerSpray();
-        }
-        if(Input.GetKeyDown("k"))
-        {
-
-        }
-        if(Input.GetKeyDown("q"))
-        {
-            warpManager.WarpPlayer();
-        }
-        if(Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            warpManager.WarpPlayer();
+            //this.gunManager.SwapGun();
         }
 
-        //Fire Control
-        if (Input.GetKeyDown("mouse 0"))
+        if (Input.GetKeyDown("q"))
         {
-            //this.gunManager.FireGun();
+            playerManager.WarpPlayer();
         }
-
-        if(Input.GetKeyDown("mouse 1"))
-        {
-
-        }
-
-
+        
     }
 
     private Vector3 moveDirection = Vector3.zero;
