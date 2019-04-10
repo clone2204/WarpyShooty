@@ -89,4 +89,9 @@ public class LobbyPlayerManager : NetworkBehaviour, ILobbyPlayerManager
     {
         return realInfoManager.GetPlayerConnection();
     }
+
+    public void ReadyPlayer()
+    {
+        realInfoManager.ReadyPlayer();
+    }
 }

@@ -9,6 +9,7 @@ public class GameManager_Server : NetworkBehaviour, IGameManager
     private GameManager clientManager;
 
     [SyncVar] private int gameTime;
+    private bool gameActive;
 
     private List<LobbyPlayerManager> lobbyPlayers;
     private int playerCount;
@@ -16,6 +17,8 @@ public class GameManager_Server : NetworkBehaviour, IGameManager
     private int killLimit;
 
     private Dictionary<GameManager.Team, List<Vector3>> spawnPoints;
+
+    [SerializeField] private int endGameTime;
 
     // Start is called before the first frame update
     void Start()
@@ -58,6 +61,7 @@ public class GameManager_Server : NetworkBehaviour, IGameManager
     public void SetupGame(List<LobbyPlayerManager> players, int timeLimit, int KillLimit)
     {
         this.killLimit = killLimit;
+        timeLimit = 1;
         this.gameTime = timeLimit * 60;
         this.lobbyPlayers = players;
         this.gamePlayers = new Dictionary<GamePlayerManager, int>();
@@ -96,6 +100,7 @@ public class GameManager_Server : NetworkBehaviour, IGameManager
     public void StartGame()
     {
         Debug.LogWarning("START GAME");
+        gameActive = true;
         StartCoroutine(Timer());
 
         this.spawnPoints = LoadSpawnPoints();
@@ -112,12 +117,15 @@ public class GameManager_Server : NetworkBehaviour, IGameManager
 
     private IEnumerator Timer()
     {
-        while (this.gameTime > 0)
+        while (gameActive && this.gameTime > 0)
         {
             yield return new WaitForSecondsRealtime(1f);
 
-            this.gameTime--;
+            this.gameTime -= 1;
         }
+
+        if(gameActive)
+            EndGame();
     }
 
     public int GetGameTime()
@@ -136,4 +144,67 @@ public class GameManager_Server : NetworkBehaviour, IGameManager
         player.SpawnPlayer(respawnPoint);
     }
 
+    public void EndGame()
+    {
+        gameActive = false;
+
+        int blueScore = 0;
+        int redScore = 0;
+        List<string> blueNames = new List<string>();
+        List<string> redNames = new List<string>();
+        List<int> blueScores = new List<int>();
+        List<int> redScores = new List<int>();
+
+        foreach(GamePlayerManager player in gamePlayers.Keys)
+        {
+            string name = player.GetName();
+            int score = gamePlayers[player];
+
+            GameManager.Team team = player.GetTeam();
+            if(team == GameManager.Team.Blue)
+            {
+                blueScore += score;
+                blueNames.Add(name);
+                blueScores.Add(score);
+            }
+            else if(team == GameManager.Team.Red)
+            {
+                redScore += score;
+                redNames.Add(name);
+                redScores.Add(score);
+            }
+
+            player.DespawnPlayer();
+        }
+
+        GameManager.Team winner;
+        if(blueScore > redScore)
+        {
+            winner = GameManager.Team.Blue;
+        }
+        else if(redScore > blueScore)
+        {
+            winner = GameManager.Team.Red;
+        }
+        else
+        {
+            winner = GameManager.Team.NONE;
+        }
+
+        clientManager.RpcEndGame(winner, blueScore, redScore, blueNames.ToArray(), blueScores.ToArray(), redNames.ToArray(), redScores.ToArray());
+        StartCoroutine(EndGameTimer());
+    }
+
+    private IEnumerator EndGameTimer()
+    {
+        int endgame = endGameTime;
+        while(endgame > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            endgame -= 1;
+        }
+
+        clientManager.RpcLobbyReturn();
+        GameObject.Find("_SCRIPTS_").GetComponent<NetworkLobbyManager>().ServerReturnToLobby();
+    }
 }

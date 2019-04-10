@@ -49,6 +49,9 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
 
         realLobbyManager.Clear();
         realLobbyManager = null;
+
+        GameObject.Find("HostLobbyCanvas").GetComponent<PlayerListManager>().ClearPlayerList();
+        listManager.ClearPlayerList();
     }
 
     public void AddPlayer(NetworkConnection playerConnection, short controllerID)
@@ -114,6 +117,14 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
             return;
 
         realLobbyManager.PlayerLoaded(lobbyPlayer, gameManager);
+    }
+
+    public void EndGame()
+    {
+        if (!isServer)
+            return;
+
+        realLobbyManager.EndGame();
     }
 
     public bool GetBeenInitialized()

@@ -28,8 +28,14 @@ public class NetworkManager : NetworkLobbyManager
         lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager>();
         networkDiscovery = GetComponent<NetworkDiscovery>();
 
-        //base.StartMatchMaker();
-        //StartCoroutine(AutoRefreshServerBrowser());
+        connectionConfig.IsAcksLong = true;
+        connectionConfig.ResendTimeout = 1500;
+        connectionConfig.NetworkDropThreshold = 90;
+        connectionConfig.MaxSentMessageQueueSize = 1024;
+        connectionConfig.MaxCombinedReliableMessageCount = 1;
+
+        base.StartMatchMaker();
+        StartCoroutine(AutoRefreshServerBrowser());
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -42,18 +48,15 @@ public class NetworkManager : NetworkLobbyManager
             serverBrowser = GameObject.Find("ServerBrowserCanvas").GetComponent<ServerBrowser>();
             lobbyManager = transform.Find("NetworkObjects").gameObject.GetComponent<LobbyManager>();
 
-            //base.StartMatchMaker();
-            //StartCoroutine(AutoRefreshServerBrowser());
+            base.StartMatchMaker();
+            StartCoroutine(AutoRefreshServerBrowser());
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown("`"))
-        {
-            base.StopClient();
-        }
+        
     }
 
     public void SetMenuStates(MenuStateManager menuStates)
@@ -70,13 +73,13 @@ public class NetworkManager : NetworkLobbyManager
         lobbyManager.Init();
         matchOpen = true;
 
-        networkDiscovery.StopBroadcast();
-        networkDiscovery.Initialize();
+        //networkDiscovery.StopBroadcast();
+        //networkDiscovery.Initialize();
+        //networkDiscovery.StartAsServer();
 
-        networkDiscovery.StartAsServer();
-
-        StartHost();
-        //StartCoroutine(AutoRefreshServer(serverName, serverPassword));
+        
+        //StartHost();
+        StartCoroutine(AutoRefreshServer(serverName, serverPassword));
     }
 
     private IEnumerator AutoRefreshServer(string name, string password)
@@ -117,11 +120,12 @@ public class NetworkManager : NetworkLobbyManager
 
     public void StartGame()
     {
-        CheckReadyToBegin();
-        //base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
         matchOpen = false;
-
         lobbyManager.StartGame();
+        CheckReadyToBegin();
+
+        if (matchMaker != null)
+            matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
     }
 
     public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
@@ -134,6 +138,10 @@ public class NetworkManager : NetworkLobbyManager
         return base.OnLobbyServerSceneLoadedForPlayer(lobbyPlayer, gamePlayer);
     }
 
+    public void ReturnToLobby()
+    {
+        lobbyManager.EndGame();
+    }
 
     public void LeaveHostLobby()
     {
@@ -146,7 +154,9 @@ public class NetworkManager : NetworkLobbyManager
 
         Debug.LogWarning("Attemp Match Destroy");
         NetworkServer.DisconnectAll();
-        //base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
+
+        if(matchMaker != null)
+            matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
 
         matchOpen = false;
         this.matchInfo = null;
@@ -167,7 +177,8 @@ public class NetworkManager : NetworkLobbyManager
     public void JoinLobby()
     {
         MatchInfoContainer matchContainer = serverBrowser.GetSelectedServer();
-        
+
+        Debug.LogWarning(matchContainer.matchInfo);
         if(matchContainer.matchInfo != null)
         {
             if (matchContainer.matchInfo.isPrivate)
@@ -186,7 +197,7 @@ public class NetworkManager : NetworkLobbyManager
             Debug.LogWarning("ADDRESS: " + matchContainer.lanAddress);
             base.networkAddress = matchContainer.lanAddress;
             StartClient();
-            //base.client.Connect(matchContainer.lanAddress, 8080);
+            base.client.Connect(matchContainer.lanAddress, 8080);
 
             menuStates.EnterLobby();
         }
@@ -210,12 +221,15 @@ public class NetworkManager : NetworkLobbyManager
 
     public override void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo)
     {
-        Debug.LogWarning("Match Joined: " + success);
+        Debug.LogWarning("Match Joined: " + success + " || " + extendedInfo);
 
         if (success)
         {
-            Debug.LogWarning("CONNECT IP: " + matchInfo.address + ":" + matchInfo.port);
+            Debug.LogWarning("CONNECT IP: " + matchInfo.address + " : " + matchInfo.port);
 
+            //networkAddress = matchInfo.address;
+            //networkPort = matchInfo.port;
+            
             base.StartClient();
             base.client.Connect(matchInfo);
             
@@ -229,6 +243,14 @@ public class NetworkManager : NetworkLobbyManager
         }
     }
 
+    public override void OnClientSceneChanged(NetworkConnection conn)
+    {
+        base.OnClientSceneChanged(conn);
+
+        if (SceneManager.GetActiveScene().name != "TitleScreen")
+            menuStates.EnterGame();
+    }
+
     public void LeaveLobby()
     {
         Debug.LogWarning("Leave Lobby: " + base.matchMaker);
@@ -239,6 +261,22 @@ public class NetworkManager : NetworkLobbyManager
         StopMatchMaker();
         StopClient();
     }
+
+    public void ReturnToMenu()
+    {
+        if(NetworkServer.active)
+        {
+            NetworkServer.DisconnectAll();
+            StopHost();
+        }
+        else
+        {
+            StopClient();
+        }
+
+        lobbyManager.Clear();
+        menuStates.LeaveGame();
+    }
     #endregion
 
     //------------------------------------------------------------------------------------------------------------------------------
@@ -247,47 +285,48 @@ public class NetworkManager : NetworkLobbyManager
     //throttling games connected through the matchmaker.
     //------------------------------------------------------------------------------------------------------------------------------
     #region
-    //public void RefreshServerBrowser()
-    //{
-    //    base.matchMaker.ListMatches(0, 10, "", false, 0, 0, OnInternetMatchList);
-    //}
+    public void RefreshServerBrowser()
+    {
+        base.matchMaker.ListMatches(0, 10, "", false, 0, 0, OnInternetMatchList);
+    }
 
-    //private IEnumerator AutoRefreshServerBrowser()
-    //{
-    //    while (true)
-    //    {
-    //        yield return new WaitUntil(() => menuStates.GetState() is ServerBrowserState);
+    private IEnumerator AutoRefreshServerBrowser()
+    {
+        while (true)
+        {
+            yield return new WaitUntil(() => menuStates.GetState() is ServerBrowserState);
 
-    //        while (menuStates.GetState() is ServerBrowserState)
-    //        {
-    //            RefreshServerBrowser();
+            while (menuStates.GetState() is ServerBrowserState)
+            {
+                RefreshServerBrowser();
 
-    //            yield return new WaitForSecondsRealtime(5f);
-    //        }
+                yield return new WaitForSecondsRealtime(5f);
+            }
 
-    //        if (GameObject.Find("JoinServerButton") == null)
-    //            break;
+            if (GameObject.Find("JoinServerButton") == null)
+                break;
 
-    //        GameObject.Find("JoinServerButton").GetComponent<Button>().interactable = false;
-    //    }
-    //}
+            GameObject.Find("JoinServerButton").GetComponent<Button>().interactable = false;
+        }
+    }
 
-    //public void OnInternetMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matches)
-    //{
-    //    try
-    //    {
-    //        Debug.Log("Adding Servers: " + matches.Count);
-    //        serverBrowser.AddNewServers(matches);
-    //    }
-    //    catch { }
-    //}
+    public void OnInternetMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matches)
+    {
+        try
+        {
+            Debug.Log("Adding Servers: " + matches.Count);
+            serverBrowser.AddNewServers(matches);
+        }
+        catch { }
+    }
 
     public void StartServerBrowser()
     {
-        networkDiscovery.Initialize();
-        networkDiscovery.StartAsClient();
+        StartMatchMaker();
+        //networkDiscovery.Initialize();
+        //networkDiscovery.StartAsClient();
 
-        StartCoroutine(PingServers());
+        //StartCoroutine(PingServers());
     }
 
     private IEnumerator PingServers()
@@ -429,18 +468,21 @@ public class NetworkManager : NetworkLobbyManager
         if(conn.lastError == NetworkError.Ok)
             base.OnClientDisconnect(conn);
 
-        Debug.LogWarning("CLIENT DISCONNECT");
+        Debug.LogWarning("CLIENT DISCONNECT: " + conn.lastError + " || " + conn.lastMessageTime);
         ClientScene.DestroyAllClientObjects();
 
-        menuStates.Disconnected("Disconnected.", conn.lastError.ToString());
+        if(menuStates.GetState() is IngameState)
+            menuStates.Disconnected("Disconnected.", conn.lastError.ToString());
 
     }
 
     private void OnApplicationQuit()
     {
         NetworkServer.DisconnectAll();
-        //base.matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
         StopHost();
+
+        if (matchMaker != null)
+            matchMaker.DestroyMatch(matchInfo.networkId, matchInfo.domain, OnDestroyMatch);
     }
     #endregion
 }

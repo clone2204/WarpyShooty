@@ -11,8 +11,9 @@ public class GamePlayerManager : NetworkBehaviour, IGamePlayerManager
 
     void Start()
     {
+        DontDestroyOnLoad(this);
         realGamePlayer = GetComponent<GamePlayerManager_Server>();
-        playerHUD = GameObject.Find("PlayerHud").GetComponent<PlayerHUDManager>();
+        playerHUD = GameObject.Find("Menues").transform.Find("PlayerHud").GetComponent<PlayerHUDManager>();
         playerHUD.SetupCameras(GetComponentInChildren<Camera>());
     }
 
@@ -51,6 +52,11 @@ public class GamePlayerManager : NetworkBehaviour, IGamePlayerManager
         realGamePlayer.SpawnPlayer(spawnPoint);
     }
 
+    public void DespawnPlayer()
+    {
+        realGamePlayer.DespawnPlayer();
+    }
+
     public void SetHealth(int health)
     {
         if (!isServer)
@@ -72,5 +78,12 @@ public class GamePlayerManager : NetworkBehaviour, IGamePlayerManager
         playerHUD.SetToPlayerView();
 
         playerHUD.SetPlayerHealth(GetHealth());
+    }
+
+    [TargetRpc]
+    public void TargetClientDespawnTasks(NetworkConnection networkConnection)
+    {
+        GetComponent<LocalPlayerController>().enabled = false;
+        playerHUD.SetToObserverView();
     }
 }

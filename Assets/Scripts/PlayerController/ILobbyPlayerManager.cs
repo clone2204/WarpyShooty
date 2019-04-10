@@ -16,4 +16,6 @@ public interface ILobbyPlayerManager
     void SetPlayerConnection(NetworkConnection networkConnection);
 
     NetworkConnection GetPlayerConnection();
+
+    void ReadyPlayer();
 }

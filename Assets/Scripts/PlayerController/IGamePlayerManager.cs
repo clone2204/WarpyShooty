@@ -12,6 +12,8 @@ public interface IGamePlayerManager
 
     void SpawnPlayer(Vector3 spawnPoint);
 
+    void DespawnPlayer();
+
     void SetHealth(int health);
 
     int GetHealth();

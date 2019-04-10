@@ -1,6 +1,6 @@
 Win
 PlayerPath?
-C:/Users/jackinswp.APPD/Documents/GitHub/WarpyShooty/TestBuild_Data/Shooty.exe
+E:/Will's_Good_Storage_Space/Shooty/TestBuild_Data/Shooty.exe
 SceneListBegin?
 Assets/Scenes/TitleScreen.unity
 Assets/Scenes/Lobby.unity
@@ -12,6 +12,7 @@ SceneListEnd?
 21be25811ed80c852a29100601d1a8b8 Assembly-CSharp-firstpass.dll:UnityStandardAssets.ImageEffects.TiltShift
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.GameManager
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.GamePlayerManager_Server
+71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.EndGameScoreManager
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
 06f0fef534ca4c1d6064fd77a26bf722 UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationTrack
 780e8f682b3221346c034a6712a0fd25 UnityEngine.Timeline.dll:UnityEngine.Timeline.AnimationPlayableAsset
@@ -138,7 +139,7 @@ d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.Spa
 230f7b5038f49d457dbcc3c455c71d9a Assembly-CSharp-firstpass.dll:UnityStandardAssets.ImageEffects.ScreenSpaceAmbientObscurance
 303ad70ce203ad874efe2965d0fbcff9 Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsEventTracker
 7fb9de8dcf73854b6b328eca1f7a6e6d Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsTracker
-35ef27870f9bf760bcb4ef556d605641 Assembly-CSharp.dll:.LocalPlayerController
+5d7822d15946dab0ccd7a7e53dcf053f Assembly-CSharp.dll:.LocalPlayerController
 122d7ffab68b4eedc72a1fce03e63c2f Assembly-CSharp-firstpass.dll:UnityStandardAssets.ImageEffects.BloomOptimized
 94017dcc9f00fe671ea7dc427b4da011 Unity.TextMeshPro.dll:TMPro.TMP_SpriteAsset
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.LobbyManager
@@ -198,7 +199,7 @@ fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEng
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.PlayerListManager
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.SprayManager
-71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.GameManager_Server
+fc1a46cf291e1f410d263cf4cad01a6a Assembly-CSharp.dll:.GameManager_Server
 5fc094978ce3e3591a7500ed380d854a Unity.Analytics.DataPrivacy.dll:UnityEngine.Analytics.DataPrivacyButton
 a8c33406fd5a44e89bd47fea3b45028f Assembly-CSharp-firstpass.dll:UnityStandardAssets.ImageEffects.ColorCorrectionRamp
 f080a86a4a939dd08c0cc4f4f05e1e4e Assembly-CSharp-firstpass.dll:UnityStandardAssets.ImageEffects.Grayscale

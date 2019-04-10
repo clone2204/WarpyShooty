@@ -61,4 +61,12 @@ public class GamePlayerManager_Server : NetworkBehaviour, IGamePlayerManager
 
         clientPlayer.TargetClientSpawnTasks(this.connectionToClient);
     }
+
+    public void DespawnPlayer()
+    {
+        Debug.LogWarning("DESPAWN");
+        transform.position = new Vector3(0, 10, 0);
+
+        clientPlayer.TargetClientDespawnTasks(this.connectionToClient);
+    }
 }

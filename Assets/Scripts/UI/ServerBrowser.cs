@@ -130,22 +130,6 @@ public class ServerBrowser : MonoBehaviour
         return selected.GetComponent<MatchInfoContainer>();
     }
 
-    public void SetErrorMessage(string type, string message)
-    {
-        Transform errorBox = GameObject.Find("ErrorMessageBox").transform;
-
-        errorBox.Find("ErrorType").GetComponent<Text>().text = type;
-        errorBox.Find("ErrorMessage").GetComponent<Text>().text = message;
-    }
-
-    public void ClearErrorMessage()
-    {
-        Transform errorBox = GameObject.Find("ErrorMessage").transform;
-
-        errorBox.Find("ErrorType").GetComponent<Text>().text = "";
-        errorBox.Find("ErrorMessage").GetComponent<Text>().text = "";
-    }
-
     public void ClearSearchBox()
     {
         Transform searchBox = GameObject.Find("ServerSearch").transform;

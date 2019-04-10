@@ -55,12 +55,17 @@ public class MenuManager : MonoBehaviour
     private Button hostGameConfirmButton;
     private Button hostGameCancelButton;
 
+    //Ingame Settings
+    private Button ingameSettingsResumeButton;
+    private Button returnToMenuButton;
+    private Button returnToLobbyButton;
+
     // Use this for initialization
     void Start ()
     {
         networkManager = GetComponent<NetworkManager>();
         settingsManager = GetComponent<SettingsManager>();
-        menuStates = new MenuStateManager();
+        menuStates = MenuStateManager.GetMenuStateManager();
         networkManager.SetMenuStates(menuStates);
 
         UIInit();
@@ -74,18 +79,15 @@ public class MenuManager : MonoBehaviour
         Debug.Log("Scene Loaded: " + scene.name);
         if (scene.name == "TitleScreen")
         {
-            UIInit();
-            SetUIActions();
+            //UIInit();
+            //SetUIActions();
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("l"))
-        {
-            Debug.Log("State: " + menuStates.GetState().ToString());
-        }
+        
     }
 
 
@@ -132,7 +134,11 @@ public class MenuManager : MonoBehaviour
         hostGameBanButton = GameObject.Find("HostLobbyBanButton").GetComponent<Button>();
         hostGameConfirmButton = GameObject.Find("HostLobbyConfirmButton").GetComponent<Button>();
         hostGameCancelButton = GameObject.Find("HostLobbyCancelButton").GetComponent<Button>();
-}
+
+        ingameSettingsResumeButton = GameObject.Find("IngameSettingsResumeButton").GetComponent<Button>();
+        returnToMenuButton = GameObject.Find("ReturnToMenuButton").GetComponent<Button>();
+        returnToLobbyButton = GameObject.Find("ReturnToLobbyButton").GetComponent<Button>();
+    }
 
     public void SetUIActions()
     {
@@ -185,6 +191,10 @@ public class MenuManager : MonoBehaviour
         hostGameBanButton.onClick.AddListener(StartBan);
         hostGameConfirmButton.onClick.AddListener(ConfirmLobbyHostAction);
         hostGameCancelButton.onClick.AddListener(CancelLobbyHostAction);
+
+        ingameSettingsResumeButton.onClick.AddListener(Back);
+        returnToMenuButton.onClick.AddListener(ReturnToMenu);
+        returnToLobbyButton.onClick.AddListener(ReturnToLobby);
     }
 
 
@@ -204,6 +214,15 @@ public class MenuManager : MonoBehaviour
 
     public void LobbyHostBack()
     {
+        serverNameField.text = "";
+        serverNameField.interactable = true;
+
+        serverPasswordToggle.interactable = true;
+        serverPasswordToggle.isOn = false;
+
+        serverPasswordField.text = "";
+        hostGameButton.interactable = true;
+
         networkManager.LeaveHostLobby();
     }
 
@@ -250,6 +269,8 @@ public class MenuManager : MonoBehaviour
 
     public void JoinServerButton()
     {
+        returnToLobbyButton.interactable = false;
+
         networkManager.JoinLobby();
     }
     
@@ -289,6 +310,8 @@ public class MenuManager : MonoBehaviour
         hostGameTimeDropdown.interactable = true;
         hostGameKillDropdown.interactable = true;
         hostGameStartButton.interactable = true;
+
+        returnToLobbyButton.interactable = true;
         
         networkManager.HostServer(serverName, serverPassword);
     }
@@ -370,6 +393,26 @@ public class MenuManager : MonoBehaviour
         hostGameSwapButton.interactable = active;
         hostGameKickButton.interactable = active;
         hostGameBanButton.interactable = active;
+    }
+
+    private void ReturnToMenu()
+    {
+        Debug.LogWarning("DING");
+        serverNameField.text = "";
+        serverNameField.interactable = true;
+
+        serverPasswordToggle.interactable = true;
+        serverPasswordToggle.isOn = false;
+
+        serverPasswordField.text = "";
+        hostGameButton.interactable = true;
+
+        networkManager.ReturnToMenu();
+    }
+
+    private void ReturnToLobby()
+    {
+        networkManager.ReturnToLobby();
     }
 
     private void SetPlayerListTogglesActive(bool active)

@@ -16,6 +16,7 @@ public class PlayerListManager : MonoBehaviour
 
     public void ClearPlayerList()
     {
+        Debug.LogWarning("DOING");
         for (int loop = 0; loop < 12; loop++)
         {
             Text name = transform.Find("PlayerList").Find("player" + loop).Find("Name").GetComponent<Text>();

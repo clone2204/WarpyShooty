@@ -11,4 +11,6 @@ public interface IGameManager
     void StartGame();
 
     int GetGameTime();
+
+    void EndGame();
 }

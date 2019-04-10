@@ -177,6 +177,12 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
     {
         gameManager.SetupGame(new List<LobbyPlayerManager>(this.players), this.gameTimeLimit, this.gameKillLimit);
 
+        foreach(LobbyPlayerManager player in players)
+        {
+            if(player != null)
+                player.ReadyPlayer();
+        }
+
         readyPlayers = new Dictionary<LobbyPlayerManager, bool>();
         for(int loop = 0; loop < 12; loop++)
         {
@@ -191,6 +197,11 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
     {
         readyPlayers[lobbyPlayer] = true;
         gameManager.LoadPlayer(lobbyPlayer, gamePlayer);
+    }
+
+    public void EndGame()
+    {
+        gameManager.EndGame();
     }
 
     private bool AreAllPlayersLoaded()

@@ -25,4 +25,5 @@ public interface ILobbyManager
 
     void PlayerLoaded(LobbyPlayerManager lobbyPlayer, GamePlayerManager gameManager);
 
+    void EndGame();
 }

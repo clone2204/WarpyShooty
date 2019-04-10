@@ -7,33 +7,54 @@ public abstract class State
 {
     protected MenuStateManager menuStates;
 
+    protected Canvas mainMenu;
+    protected Canvas serverBrowser;
+    protected Canvas settings;
+    protected Canvas playerLobby;
+    protected Canvas hostLobby;
+    protected Canvas error;
+    protected Canvas player;
+
     public State(MenuStateManager menuStates) { this.menuStates = menuStates; }
-    public virtual void OpenSettings() { throw new NotImplementedException(); }
-    public virtual void OpenBrowser() { throw new NotImplementedException(); }
-    public virtual void HostGame() { throw new NotImplementedException(); }
-    public virtual void EnterLobby() { throw new NotImplementedException(); }
-    public virtual void SearchServers() { throw new NotImplementedException(); }
-    public virtual void CompleteServerSearch() { throw new NotImplementedException(); }
-    public virtual void EnterGame() { throw new NotImplementedException(); }
-    public virtual void NeedsPassword() { throw new NotImplementedException(); }
-    public virtual void Disconnected(string errorType, string error) { throw new NotImplementedException(); }
-    public virtual void OpenIngameMenu() { throw new NotImplementedException(); }
-    public virtual void OpenIngameSettings() { throw new NotImplementedException(); }
-    public virtual void LeaveGame() { throw new NotImplementedException(); }
-    public virtual void BackToLobby() { throw new NotImplementedException(); }
-    public virtual void Back() { throw new NotImplementedException(); }
+    public virtual void OpenSettings() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void OpenBrowser() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void HostGame() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void EnterLobby() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void SearchServers() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void CompleteServerSearch() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void EnterGame() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void NeedsPassword() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void Disconnected(string errorType, string error) { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void OpenIngameMenu() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void LeaveGame() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void EndGame() { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void BackToLobby(bool isHost) { throw new NotImplementedException(menuStates.ToString()); }
+    public virtual void Back() { throw new NotImplementedException(menuStates.ToString()); }
 }
 
 public class MenuStateManager
 {
+    private static MenuStateManager singleton;
     private State currentState;
 
     // Use this for initialization
-    public MenuStateManager()
+    private MenuStateManager()
     {
         currentState = new MainMenuState(this);
     }
 
+    public static MenuStateManager GetMenuStateManager()
+    {
+        if (singleton == null)
+            singleton = new MenuStateManager();
+
+        return singleton;
+    }
+
+    public string ToString()
+    {
+        return currentState.ToString();
+    }
     
     public void SetState(State state)
     {
@@ -68,9 +89,9 @@ public class MenuStateManager
         currentState.EnterLobby();
     }
 
-    public void BackToLobby()
+    public void BackToLobby(bool isHost)
     {
-        currentState.BackToLobby();
+        currentState.BackToLobby(isHost);
     }
 
     public void SearchServers()
@@ -103,6 +124,11 @@ public class MenuStateManager
         currentState.OpenIngameMenu();
     }
 
+    public void EndGame()
+    {
+        currentState.EndGame();
+    }
+
     public void LeaveGame()
     {
         currentState.LeaveGame();
@@ -110,7 +136,7 @@ public class MenuStateManager
 
     public void OpenIngameSettings()
     {
-        currentState.OpenIngameSettings();
+        currentState.OpenIngameMenu();
     }
 
     public void Back()
@@ -248,6 +274,8 @@ class LobbyState : State
         GameObject.Find("HostLobbyCanvas").GetComponent<Canvas>().enabled = false;
         GameObject.Find("LobbyCanvas").GetComponent<Canvas>().enabled = false;
 
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = true;
+
         menuStates.SetState(new IngameState(menuStates));
     }
 
@@ -287,16 +315,37 @@ class IngameState : State
 
     public override void Disconnected(string errorType, string error)
     {
-        ServerBrowser serverBrowser = GameObject.Find("ServerBrowserCanvas").GetComponent<ServerBrowser>();
-        serverBrowser.SetErrorMessage(errorType, error);
-        GameObject.Find("ErrorMessageBox").transform.localPosition = new Vector3();
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
 
+        GameObject.Find("ErrorCanvas").GetComponent<ErrorMessageManager>().SetErrorMessage(errorType, error);
+        
         menuStates.SetState(new ErrorMessageState(menuStates));
     }
 
-    public override void LeaveGame()
+    public override void EndGame()
     {
-        menuStates.SetState(new MainMenuState(menuStates));
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("EndGameCanvas").GetComponent<Canvas>().enabled = true;
+
+    }
+
+    public override void BackToLobby(bool isHost)
+    {
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("EndGameCanvas").GetComponent<Canvas>().enabled = false;
+
+        GameObject.Find("HostLobbyCanvas").GetComponent<Canvas>().enabled = isHost;
+        GameObject.Find("LobbyCanvas").GetComponent<Canvas>().enabled = !isHost;
+
+        menuStates.SetState(new LobbyState(menuStates));
+    }
+
+    public override void OpenIngameMenu()
+    {
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("IngameSettingCanvas").GetComponent<Canvas>().enabled = true;
+
+        menuStates.SetState(new IngameMenuState(menuStates));
     }
 }
 
@@ -304,12 +353,40 @@ class IngameMenuState : State
 {
     public IngameMenuState(MenuStateManager menuStates) : base(menuStates) { }
 
-}
+    public override void EndGame()
+    {
+        GameObject.Find("IngameSettingCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("EndGameCanvas").GetComponent<Canvas>().enabled = true;
 
-class IngameSettingsState : State
-{
-    public IngameSettingsState(MenuStateManager menuStates) : base(menuStates) { }
+    }
 
+    public override void BackToLobby(bool isHost)
+    {
+        GameObject.Find("IngameSettingCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("EndGameCanvas").GetComponent<Canvas>().enabled = false;
+
+        GameObject.Find("HostLobbyCanvas").GetComponent<Canvas>().enabled = isHost;
+        GameObject.Find("LobbyCanvas").GetComponent<Canvas>().enabled = !isHost;
+
+        menuStates.SetState(new LobbyState(menuStates));
+    }
+
+    public override void LeaveGame()
+    {
+        GameObject.Find("IngameSettingCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("MainMenuCanvas").GetComponent<Canvas>().enabled = true;
+
+        menuStates.SetState(new MainMenuState(menuStates));
+    }
+
+    public override void Back()
+    {
+        GameObject.Find("IngameSettingCanvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("PlayerHud").GetComponent<Canvas>().enabled = true;
+    }
 }
 
 class ErrorMessageState : State

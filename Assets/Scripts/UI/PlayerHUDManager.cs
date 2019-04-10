@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using System.Collections;
 
@@ -24,16 +25,7 @@ public class PlayerHUDManager : MonoBehaviour
         playerInfoHUD = transform.Find("PlayerInfoHUD");
         gunInfoHUD = transform.Find("GunInfoHUD");
         centerHUD = transform.Find("CenterHUD");
-
-
     }
-
-   
-	// Update is called once per frame
-	void Update ()
-    {
-        
-	}
 
     public void SetupCameras(Camera playerCamera)
     {

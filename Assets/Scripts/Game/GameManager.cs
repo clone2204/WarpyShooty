@@ -64,4 +64,37 @@ public class GameManager : NetworkBehaviour, IGameManager
     {
         return realGameManager.GetGameTime();
     }
+
+    public void EndGame()
+    {
+        realGameManager.EndGame();
+    }
+
+    [ClientRpc]
+    public void RpcEndGame(GameManager.Team winningTeam, int blueScore, int redScore, string[] blueNames, int[] blueScores, string[]redNames, int[] redScores)
+    {
+        MenuStateManager menuStates = MenuStateManager.GetMenuStateManager();
+        menuStates.EndGame();
+
+        Dictionary<string, int> blueTeam = new Dictionary<string, int>();
+        for(int loop = 0; loop < blueNames.Length; loop++)
+        {
+            blueTeam.Add(blueNames[loop], blueScores[loop]);
+        }
+
+        Dictionary<string, int> redTeam = new Dictionary<string, int>();
+        for (int loop = 0; loop < redNames.Length; loop++)
+        {
+            redTeam.Add(redNames[loop], redScores[loop]);
+        }
+
+        GameObject.Find("EndGameCanvas").GetComponent<EndGameScoreManager>().SetScores(winningTeam, blueScore, redScore, blueTeam, redTeam);
+    }
+
+    [ClientRpc]
+    public void RpcLobbyReturn()
+    {
+        MenuStateManager menuStates = MenuStateManager.GetMenuStateManager();
+        menuStates.BackToLobby(isServer);
+    }
 }

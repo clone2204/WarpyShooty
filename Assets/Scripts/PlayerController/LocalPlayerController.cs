@@ -44,6 +44,11 @@ public class LocalPlayerController : NetworkBehaviour
     {
         KeyboardInput();
         MouseMovement();
+
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            MenuStateManager.GetMenuStateManager().OpenIngameSettings();
+        }
     }
 
     private void KeyboardInput()

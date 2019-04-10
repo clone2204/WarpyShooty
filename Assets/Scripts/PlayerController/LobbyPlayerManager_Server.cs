@@ -50,4 +50,9 @@ public class LobbyPlayerManager_Server : NetworkBehaviour, ILobbyPlayerManager
     {
         return this.playerConnection;
     }
+
+    public void ReadyPlayer()
+    {
+        GetComponent<NetworkLobbyPlayer>().readyToBegin = true;
+    }
 }
