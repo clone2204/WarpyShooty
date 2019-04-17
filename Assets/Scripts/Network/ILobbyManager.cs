@@ -9,7 +9,7 @@ public interface ILobbyManager
 
     void Clear();
 
-    void AddPlayer(NetworkConnection playerConnection, short controllerID);
+    void AddPlayer(NetworkConnection playerConnection);
 
     void RemovePlayer(NetworkConnection playerConnection);
 

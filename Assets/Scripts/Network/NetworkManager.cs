@@ -229,7 +229,8 @@ public class NetworkManager : NetworkLobbyManager
 
             //networkAddress = matchInfo.address;
             //networkPort = matchInfo.port;
-            
+
+            StopMatchMaker();
             base.StartClient();
             base.client.Connect(matchInfo);
             
@@ -434,7 +435,31 @@ public class NetworkManager : NetworkLobbyManager
     //Event Calls
     //------------------------------------------------------------------------------------------------------------------------------
     #region
+    //public override void OnLobbyServerConnect(NetworkConnection conn)
+    //{
+    //    if (!((LobbyManager)lobbyManager).GetBeenInitialized())
+    //    {
+    //        lobbyManager.Init();
+    //    }
 
+    //    Debug.Log("LOBBY SERVER CONNECT");
+    //    lobbyManager.AddPlayer(conn);
+
+    //    base.OnLobbyServerConnect(conn);
+    //}
+
+    //public override void OnServerConnect(NetworkConnection conn)
+    //{
+    //    base.OnServerConnect(conn);
+
+    //    Debug.LogWarning("SERVER CONNECT");
+    //    if (!((LobbyManager)lobbyManager).GetBeenInitialized())
+    //    {
+    //        lobbyManager.Init();
+    //    }
+
+    //    lobbyManager.AddPlayer(conn);
+    //}
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
@@ -446,15 +471,37 @@ public class NetworkManager : NetworkLobbyManager
         }
 
         Debug.Log("PLAYER ADDED");
-        lobbyManager.AddPlayer(conn, playerControllerId);
+        lobbyManager.AddPlayer(conn);
 
-        
+
     }
 
-    public override void OnServerDisconnect(NetworkConnection conn)
+    //public override GameObject OnLobbyServerCreateLobbyPlayer(NetworkConnection conn, short playerControllerId)
+    //{
+
+
+    //    //GameObject lobbyPlayer = base.OnLobbyServerCreateGamePlayer(conn, playerControllerId);
+    //    Debug.LogWarning("LOBBYPLAYER: " + conn.playerControllers.Count);
+    //    //LobbyPlayerManager lobbyPlayerScript = lobbyPlayer.GetComponent<LobbyPlayerManager>();
+
+    //    //if (!((LobbyManager)lobbyManager).GetBeenInitialized())
+    //    //{
+    //    //    lobbyManager.Init();
+    //    //}
+
+    //    //Debug.Log("PLAYER ADDED");
+    //    //lobbyManager.AddPlayer(lobbyPlayerScript, conn);
+
+    //    return null;
+    //    //return lobbyPlayer;
+    //}
+
+    public override void OnLobbyServerDisconnect(NetworkConnection conn)
     {
         if (conn.lastError == NetworkError.Ok)
-            base.OnServerDisconnect(conn);
+            base.OnLobbyServerDisconnect(conn);
+
+        Debug.LogWarning("CLIENT DISCONNECTED DUE TO: " + conn.lastError + " || " + conn.lastMessageTime);
 
         NetworkServer.DestroyPlayersForConnection(conn);
         
@@ -463,10 +510,10 @@ public class NetworkManager : NetworkLobbyManager
         //base.OnServerDisconnect(conn);
     }
 
-    public override void OnClientDisconnect(NetworkConnection conn)
+    public override void OnLobbyClientDisconnect(NetworkConnection conn)
     {
         if(conn.lastError == NetworkError.Ok)
-            base.OnClientDisconnect(conn);
+            base.OnLobbyClientDisconnect(conn);
 
         Debug.LogWarning("CLIENT DISCONNECT: " + conn.lastError + " || " + conn.lastMessageTime);
         ClientScene.DestroyAllClientObjects();

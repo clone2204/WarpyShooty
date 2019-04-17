@@ -5,21 +5,30 @@ using UnityEngine.Networking;
 
 public class GameManager : NetworkBehaviour, IGameManager
 {
-    private IGameManager realGameManager;
+    
+    private List<LobbyPlayerManager> lobbyPlayers;
+    private int playerCount;
+    private Dictionary<GamePlayerManager, int> gamePlayers;
+
+    private int blueKills;
+    private int redKills;
+    private int killLimit;
+
+    private Dictionary<GameManager.Team, List<Vector3>> spawnPoints;
+
+    [SyncVar] private int gameTime;
+    private bool gameActive;
+
+    [SerializeField] private int respawnTime;
+    [SerializeField] private int endGameTime;
 
     private PlayerHUDManager hudManager;
 
-    public enum Team
-    {
-        Red,
-        Blue,
-        NONE
-    }
+    
     // Start is called before the first frame update
     void Start()
     {
-        realGameManager = GetComponent<GameManager_Server>();
-
+        
     }
 
     // Update is called once per frame
@@ -29,49 +38,178 @@ public class GameManager : NetworkBehaviour, IGameManager
             hudManager.UpdateGameTime(GetGameTime());
     }
 
-    public void SetupGame(List<LobbyPlayerManager> players, int timeLimit, int KillLimit)
-    {
-        if (!isServer)
-            return;
+    //=================================================================================================
+    //Server Functions
+    //=================================================================================================
 
-        
-        realGameManager.SetupGame(players, timeLimit, KillLimit);
+    public void SetupGame(List<LobbyPlayerManager> players, int timeLimit, int killLimit)
+    {
+        this.killLimit = killLimit;
+        this.blueKills = 0;
+        this.redKills = 0;
+
+        this.gameTime = timeLimit * 60;
+        this.lobbyPlayers = players;
+        this.gamePlayers = new Dictionary<GamePlayerManager, int>();
+
+        playerCount = 0;
+        foreach (LobbyPlayerManager player in lobbyPlayers)
+        {
+            if (player != null)
+                playerCount++;
+        }
     }
 
     public void LoadPlayer(LobbyPlayerManager lobbyPlayer, GamePlayerManager gamePlayer)
     {
-        if (!isServer)
-            return;
-
-        realGameManager.LoadPlayer(lobbyPlayer, gamePlayer);
+        StartCoroutine(WaitForPlayerLoad(this.lobbyPlayers, this.gamePlayers, lobbyPlayer, gamePlayer));
     }
+
 
     public void StartGame()
     {
-        if (!isServer)
-            return;
+        Debug.LogWarning("START GAME");
+        gameActive = true;
+        StartCoroutine(Timer());
 
-        realGameManager.StartGame();
-    }
+        this.spawnPoints = LoadSpawnPoints();
 
-    [ClientRpc]
-    public void RpcStartGameClock()
-    {
-        hudManager = GameObject.Find("PlayerHud").GetComponent<PlayerHUDManager>();
+        Debug.LogWarning("Gameplayers: " + gamePlayers.Keys.Count);
+        foreach (GamePlayerManager gamePlayer in gamePlayers.Keys)
+        {
+            Debug.LogWarning("Spawn Player");
+            SpawnPlayer(gamePlayer);
+        }
+
+        RpcStartGameClock();
     }
 
     public int GetGameTime()
     {
-        return realGameManager.GetGameTime();
+        return gameTime;
+    }
+
+    private void SpawnPlayer(GamePlayerManager player)
+    {
+        GameManager.Team playerTeam = player.GetTeam();
+
+        System.Random rand = new System.Random();
+        int random = rand.Next(spawnPoints[playerTeam].Count);
+        Vector3 respawnPoint = spawnPoints[playerTeam][random];
+
+        player.transform.position = respawnPoint;
+        player.SetHealth(100);
+
+        player.EnablePlayer();
+    }
+
+    private void DespawnPlayer(GamePlayerManager player)
+    {
+        player.transform.position = new Vector3(0, 10, 0);
+
+        player.DisablePlayer();
+    }
+
+    public void KillPlayer(GamePlayerManager player, GamePlayerManager killer)
+    {
+        if(player.Equals(killer))
+        {
+            gamePlayers[player]--;
+            DespawnPlayer(player);
+            return;
+        }
+
+        gamePlayers[killer]++;
+        if(killer.GetTeam() == Team.Blue)
+        {
+            blueKills++;
+        }
+        else if(killer.GetTeam() == Team.Red)
+        {
+            redKills++;
+        }
+
+        if(blueKills >= killLimit || redKills >= killLimit)
+        {
+            EndGame();
+        }
+
+        DespawnPlayer(player);
+        StartCoroutine(RespawnTimer(player));
+    }
+
+    private IEnumerator RespawnTimer(GamePlayerManager player)
+    {
+        yield return new WaitForSecondsRealtime(respawnTime);
+
+        SpawnPlayer(player);
     }
 
     public void EndGame()
     {
-        realGameManager.EndGame();
+        gameActive = false;
+
+        int blueScore = 0;
+        int redScore = 0;
+        List<string> blueNames = new List<string>();
+        List<string> redNames = new List<string>();
+        List<int> blueScores = new List<int>();
+        List<int> redScores = new List<int>();
+
+        foreach (GamePlayerManager player in gamePlayers.Keys)
+        {
+            string name = player.GetName();
+            int score = gamePlayers[player];
+
+            GameManager.Team team = player.GetTeam();
+            if (team == GameManager.Team.Blue)
+            {
+                blueScore += score;
+                blueNames.Add(name);
+                blueScores.Add(score);
+            }
+            else if (team == GameManager.Team.Red)
+            {
+                redScore += score;
+                redNames.Add(name);
+                redScores.Add(score);
+            }
+
+
+            DespawnPlayer(player);
+        }
+
+        GameManager.Team winner;
+        if (blueScore > redScore)
+        {
+            winner = GameManager.Team.Blue;
+        }
+        else if (redScore > blueScore)
+        {
+            winner = GameManager.Team.Red;
+        }
+        else
+        {
+            winner = GameManager.Team.NONE;
+        }
+
+        RpcEndGame(winner, blueScore, redScore, blueNames.ToArray(), blueScores.ToArray(), redNames.ToArray(), redScores.ToArray());
+        StartCoroutine(EndGameTimer());
+    }
+
+    
+    //=================================================================================================
+    //Client Functions
+    //=================================================================================================
+
+    [ClientRpc]
+    private void RpcStartGameClock()
+    {
+        hudManager = GameObject.Find("PlayerHud").GetComponent<PlayerHUDManager>();
     }
 
     [ClientRpc]
-    public void RpcEndGame(GameManager.Team winningTeam, int blueScore, int redScore, string[] blueNames, int[] blueScores, string[]redNames, int[] redScores)
+    private void RpcEndGame(GameManager.Team winningTeam, int blueScore, int redScore, string[] blueNames, int[] blueScores, string[]redNames, int[] redScores)
     {
         MenuStateManager menuStates = MenuStateManager.GetMenuStateManager();
         menuStates.EndGame();
@@ -92,9 +230,92 @@ public class GameManager : NetworkBehaviour, IGameManager
     }
 
     [ClientRpc]
-    public void RpcLobbyReturn()
+    private void RpcLobbyReturn()
     {
         MenuStateManager menuStates = MenuStateManager.GetMenuStateManager();
         menuStates.BackToLobby(isServer);
     }
+
+    //=================================================================================================
+    //Helper Functions
+    //=================================================================================================
+
+    public enum Team
+    {
+        Red,
+        Blue,
+        NONE
+    }
+
+    private IEnumerator Timer()
+    {
+        while (gameActive && this.gameTime > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+
+            this.gameTime -= 1;
+        }
+
+        if (gameActive)
+            EndGame();
+    }
+
+    private IEnumerator WaitForPlayerLoad(List<LobbyPlayerManager> lobbyPlayers, Dictionary<GamePlayerManager, int> gamePlayers, LobbyPlayerManager lobbyPlayer, GamePlayerManager gamePlayer)
+    {
+        yield return new WaitUntil(() => gamePlayer.isServer);
+
+        Debug.LogWarning("DING");
+        int playerIndex = lobbyPlayers.IndexOf(lobbyPlayer);
+
+        GameManager.Team playerTeam = (playerIndex < 6 ? GameManager.Team.Blue : GameManager.Team.Red);
+
+        gamePlayer.SetupPlayer(lobbyPlayer.GetName(), playerTeam);
+        Debug.LogWarning("Gameplayers add");
+        gamePlayers.Add(gamePlayer, 0);
+        Debug.LogWarning("Gamelayers after add: " + gamePlayers.Keys.Count);
+
+        if (gamePlayers.Keys.Count == playerCount)
+            StartGame();
+    }
+
+    private Dictionary<GameManager.Team, List<Vector3>> LoadSpawnPoints()
+    {
+        Dictionary<GameManager.Team, List<Vector3>> spawnPoints = new Dictionary<GameManager.Team, List<Vector3>>();
+        spawnPoints.Add(GameManager.Team.Red, new List<Vector3>());
+        spawnPoints.Add(GameManager.Team.Blue, new List<Vector3>());
+        spawnPoints.Add(GameManager.Team.NONE, new List<Vector3>());
+
+        foreach (GameObject point in GameObject.FindGameObjectsWithTag("Respawn"))
+        {
+            if (point.GetComponent<SpawnPoint>().team == GameManager.Team.Red)
+            {
+                spawnPoints[GameManager.Team.Red].Add(point.transform.position);
+            }
+            else if (point.GetComponent<SpawnPoint>().team == GameManager.Team.Blue)
+            {
+                spawnPoints[GameManager.Team.Blue].Add(point.transform.position);
+            }
+            else if (point.GetComponent<SpawnPoint>().team == GameManager.Team.NONE)
+            {
+                spawnPoints[GameManager.Team.NONE].Add(point.transform.position);
+            }
+        }
+
+        return spawnPoints;
+    }
+
+    private IEnumerator EndGameTimer()
+    {
+        int endgame = endGameTime;
+        while (endgame > 0)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            endgame -= 1;
+        }
+
+        RpcLobbyReturn();
+        GameObject.Find("_SCRIPTS_").GetComponent<NetworkLobbyManager>().ServerReturnToLobby();
+    }
+
+
 }

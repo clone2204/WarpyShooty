@@ -54,12 +54,12 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
         listManager.ClearPlayerList();
     }
 
-    public void AddPlayer(NetworkConnection playerConnection, short controllerID)
+    public void AddPlayer(NetworkConnection playerConnection)
     {
         if (!isServer)
             return;
 
-        realLobbyManager.AddPlayer(playerConnection, controllerID);        
+        realLobbyManager.AddPlayer(playerConnection);        
     }
 
     public void RemovePlayer(NetworkConnection playerConnection)

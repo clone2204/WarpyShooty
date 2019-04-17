@@ -134,7 +134,6 @@ public class LocalPlayerController : NetworkBehaviour
         {
             verticalMovement = jumpSpeed;
         }
-
         characterController.Move(moveDirection * Time.deltaTime);
     }
 

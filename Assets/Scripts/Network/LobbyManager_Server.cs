@@ -45,7 +45,7 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
         players = null;
     }
 
-    public void AddPlayer(NetworkConnection playerConnection, short controllerID)
+    public void AddPlayer(NetworkConnection playerConnection)
     {
         if(bannedPlayers.Contains(playerConnection.address))
         {
@@ -53,7 +53,7 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
             return;
         }
 
-        StartCoroutine(WaitForClientInfo(playerConnection, controllerID));
+        StartCoroutine(WaitForClientInfo(playerConnection));
     }
 
     private IEnumerator WaitForConnection(NetworkConnection connection)
@@ -63,27 +63,28 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
         connection.Disconnect();
     }
 
-    private IEnumerator WaitForClientInfo(NetworkConnection playerConnection, short controllerID)
+    private IEnumerator WaitForClientInfo(NetworkConnection playerConnection)
     {
-        GameObject player = playerConnection.playerControllers[controllerID].gameObject;
-        LobbyPlayerManager playerInfo = player.GetComponent<LobbyPlayerManager>();
-        playerInfo.Init();
+        yield return new WaitUntil(() => playerConnection.playerControllers.Count != 0);
 
-        yield return new WaitUntil(() => playerInfo.GetName() != null);
+        LobbyPlayerManager lobbyPlayer = playerConnection.playerControllers[0].gameObject.GetComponent<LobbyPlayerManager>();
+        lobbyPlayer.Init();
+        
+        yield return new WaitUntil(() => lobbyPlayer.GetName() != null);
 
-        playerInfo.SetPlayerObjectID(player.GetComponent<NetworkIdentity>().netId);
-        playerInfo.SetPlayerConnection(playerConnection);
+        lobbyPlayer.SetPlayerObjectID(lobbyPlayer.GetComponent<NetworkIdentity>().netId);
+        lobbyPlayer.SetPlayerConnection(lobbyPlayer.connectionToClient);
 
         for(int loop = 0; loop < 6; loop++)
         {
             if(players[loop] == null)
             {
-                players[loop] = playerInfo;
+                players[loop] = lobbyPlayer;
                 break;
             }
             else if(players[loop + 6] == null)
             {
-                players[loop + 6] = playerInfo;
+                players[loop + 6] = lobbyPlayer;
                 break;
             }
         }

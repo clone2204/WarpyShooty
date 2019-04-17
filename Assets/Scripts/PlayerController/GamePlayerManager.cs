@@ -5,8 +5,9 @@ using UnityEngine.Networking;
 
 public class GamePlayerManager : NetworkBehaviour
 {
-    private PlayerHUDManager playerHUD;
+    private GameManager gameManager;
 
+    private PlayerHUDManager playerHUD;
     private IWarp warpManager;
     private GunManager gunManager;
 
@@ -17,7 +18,8 @@ public class GamePlayerManager : NetworkBehaviour
 
     void Start()
     {
-        DontDestroyOnLoad(this);
+        gameManager = GameObject.Find("_SCRIPTS_").GetComponent<GameManager>();
+
         playerHUD = GameObject.Find("Menues").transform.Find("PlayerHud").GetComponent<PlayerHUDManager>();
         playerHUD.SetupCameras(GetComponentInChildren<Camera>());
 
@@ -40,6 +42,7 @@ public class GamePlayerManager : NetworkBehaviour
         if (!isServer)
             return;
 
+        Debug.LogWarning("SETUP PLAYER ON SERVER: " + playerName);
         this.playerName = playerName;
         this.playerTeam = playerTeam;
 
@@ -56,41 +59,48 @@ public class GamePlayerManager : NetworkBehaviour
         return playerTeam;
     }
 
-    public void SpawnPlayer(Vector3 spawnPoint)
-    {
-        if (!isServer)
-            return;
-
-        Debug.LogWarning("Spawn Player");
-        transform.position = spawnPoint;
-        this.playerHealth = 100;
-
-        TargetClientSpawnTasks(this.connectionToClient);
-    }
-
-    public void DespawnPlayer()
-    {
-        if (!isServer)
-            return;
-
-        Debug.LogWarning("DESPAWN");
-        transform.position = new Vector3(0, 10, 0);
-
-        TargetClientDespawnTasks(this.connectionToClient);
-    }
-
     public void SetHealth(int health)
     {
         if (!isServer)
             return;
 
         playerHealth = health;
+        TargetUpdatePlayerHealth(connectionToClient);
     }
 
     public int GetHealth()
     {
         return playerHealth;
     }
+
+    public void DamagePlayer(int damage, GamePlayerManager damager)
+    {
+        if (!isServer)
+            return;
+
+        if ((damager.GetTeam() == playerTeam) && (damager.Equals(this)))
+            return;
+
+        playerHealth -= damage;
+        TargetUpdatePlayerHealth(connectionToClient);
+
+        if (playerHealth <= 0)
+            gameManager.KillPlayer(this, damager);
+    }
+
+    public void EnablePlayer()
+    {
+        TargetEnablePlayerController(this.connectionToClient);
+    }
+
+    public void DisablePlayer()
+    {
+        TargetDisablePlayerController(this.connectionToClient);
+    }
+
+    //=================================================================================================
+    //Player Control Functions
+    //=================================================================================================
 
     public void WarpPlayer()
     {
@@ -104,7 +114,7 @@ public class GamePlayerManager : NetworkBehaviour
 
     public void StartPrimaryFire()
     {
-        gunManager.StartPrimaryFire();
+        gunManager.StartPrimaryFire(this);
     }
 
     public void StopPrimaryFire()
@@ -114,7 +124,7 @@ public class GamePlayerManager : NetworkBehaviour
 
     public void StartAltFire()
     {
-        gunManager.StartAltFire();
+        gunManager.StartAltFire(this);
     }
 
     public void StopAltFire()
@@ -149,29 +159,33 @@ public class GamePlayerManager : NetworkBehaviour
 
 
     //=================================================================================================
-    //Interface Functions
+    //Client Functions
     //=================================================================================================
 
 
     [TargetRpc]
     private void TargetSetupPlayer(NetworkConnection playerConn)
     {
+        Debug.LogWarning("SETUP PLAYER");
         playerHUD.SetPlayerName(playerName);
         playerHUD.SetPlayerTeam(playerTeam);
     }
 
     [TargetRpc]
-    private void TargetClientSpawnTasks(NetworkConnection target)
+    private void TargetUpdatePlayerHealth(NetworkConnection playerConn)
     {
-        Debug.LogWarning("Client Enable");
-        GetComponent<LocalPlayerController>().enabled = true;
-        playerHUD.SetToPlayerView();
-
         playerHUD.SetPlayerHealth(playerHealth);
     }
 
     [TargetRpc]
-    private void TargetClientDespawnTasks(NetworkConnection networkConnection)
+    private void TargetEnablePlayerController(NetworkConnection target)
+    {
+        GetComponent<LocalPlayerController>().enabled = true;
+        playerHUD.SetToPlayerView();
+    }
+
+    [TargetRpc]
+    private void TargetDisablePlayerController(NetworkConnection networkConnection)
     {
         GetComponent<LocalPlayerController>().enabled = false;
         playerHUD.SetToObserverView();

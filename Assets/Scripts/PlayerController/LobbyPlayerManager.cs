@@ -31,9 +31,11 @@ public class LobbyPlayerManager : NetworkBehaviour, ILobbyPlayerManager
 
             string name = GameObject.Find("_SCRIPTS_").GetComponent<SettingsManager>().GetPlayerName();
             CmdSetName(name);
+
         }
 
-        lobbyPlayer.readyToBegin = true;
+        //GetComponent<NetworkLobbyPlayer>().SendReadyToBeginMessage();
+        //lobbyPlayer.readyToBegin = true;
     }
 
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
