@@ -15,19 +15,17 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
     private bool primaryFireActive;
     private bool primaryFireOnCooldown;
 
-    private Func<int, bool> ConsumeAmmo;
     private IAltFireBehavior altFireBehavior;
-    private IReloadBehavior reloadBehavior;
+    private IAmmoBehavior ammoBehavior;
 
     private GamePlayerManager player;
     private Func<Vector3> GetSpawnLocation;
     private Func<Vector3> GetLookDirection;
 
-    public void Init(Func<int, bool> ConsumeAmmo, IAltFireBehavior altFireBehavior, IReloadBehavior reloadBehavior)
+    public void Init(IAltFireBehavior altFireBehavior, IAmmoBehavior ammoBehavior)
     {
-        this.ConsumeAmmo = ConsumeAmmo;
         this.altFireBehavior = altFireBehavior;
-        this.reloadBehavior = reloadBehavior;
+        this.ammoBehavior = ammoBehavior;
 
         primaryFireActive = false;
         primaryFireOnCooldown = false;
@@ -64,15 +62,11 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
         {
             yield return new WaitUntil(() => primaryFireActive);
 
-            while (primaryFireActive && !reloadBehavior.GetReloadActive())
+            while (primaryFireActive && !ammoBehavior.GetReloadActive())
             {
                 primaryFireOnCooldown = true;
 
-                if(!ConsumeAmmo(1))
-                {
-                    StartCoroutine(StartReload());
-                }
-                else
+                if(ammoBehavior.ConsumeAmmo(1))
                 {
                     //This method is not working
                     //Probably need to init projectile after spawning it
@@ -82,20 +76,11 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
 
                     NetworkServer.Spawn(newProjectile);
                 }
-
+                
                 yield return new WaitForSecondsRealtime(refireTime);
 
                 primaryFireOnCooldown = false;
             }
         }
-    }
-
-    private IEnumerator StartReload()
-    {
-        reloadBehavior.StartReload();
-
-        yield return new WaitForSecondsRealtime(.2f);
-
-        reloadBehavior.StopReload();
     }
 }

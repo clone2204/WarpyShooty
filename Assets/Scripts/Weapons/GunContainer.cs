@@ -4,11 +4,8 @@ using System.Collections;
 
 public class GunContainer : NetworkBehaviour {
 
-    //private GameObject localPlayer;
-    public GameObject containedGun;
-    public NetworkInstanceId gunID;
-
-
+    [SerializeField] private Gun containedGun;
+    
     // Use this for initialization
     void Start ()
     {
@@ -20,7 +17,6 @@ public class GunContainer : NetworkBehaviour {
     {
         if (this.containedGun != null)
             MoveGun();
-        
 	}
 
     private void MoveGun()
@@ -31,23 +27,28 @@ public class GunContainer : NetworkBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.name != "Player(Clone)")
+        GunManager playerGunManager = col.GetComponent<GunManager>();
+
+        if (playerGunManager == null)
             return;
 
-        col.gameObject.GetComponent<GunManager>().SetSwappableGunContainer(this.gameObject);
-        
+
+        playerGunManager.SetSwappableGunContainer(this);
     }
 
     void OnTriggerExit(Collider col)
     {
-        if (col.gameObject.name != "Player(Clone)")
+        GunManager playerGunManager = col.GetComponent<GunManager>();
+
+        if (playerGunManager == null)
             return;
 
-        col.gameObject.GetComponent<GunManager>().SetSwappableGunContainer(null);
-        
+
+        playerGunManager.SetSwappableGunContainer(null);
+
     }
 
-    public void SetContainedGun(GameObject gun)
+    public void SetContainedGun(Gun gun)
     {
         if (gun == null)
             return;
@@ -55,6 +56,11 @@ public class GunContainer : NetworkBehaviour {
         containedGun = gun;
         containedGun.transform.parent = transform;
         containedGun.transform.localPosition = new Vector3(0, .7f, 0);
+    }
+
+    public Gun GetContainedGun()
+    {
+        return this.containedGun;
     }
 
     public void DestroyContainer()

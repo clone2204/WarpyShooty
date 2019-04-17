@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IPrimaryFireBehavior
 {
-    void Init(System.Func<int, bool> ConsumeAmmo, IAltFireBehavior altFireBehavior, IReloadBehavior reloadBehavior);
+    void Init(IAltFireBehavior altFireBehavior, IAmmoBehavior ammoBehavior);
 
     void PrimaryFireStart(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetLookDirection);
 

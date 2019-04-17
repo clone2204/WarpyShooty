@@ -31,7 +31,7 @@ public class WeaponSpawner : NetworkBehaviour
         gunContainer = (GameObject)Instantiate(containerPrefab, transform.position, new Quaternion());
         gunContainerScript = gunContainer.GetComponent<GunContainer>();
 
-        gunContainerScript.SetContainedGun((GameObject)Instantiate(weapon));
+        //gunContainerScript.SetContainedGun((GameObject)Instantiate(weapon).GetComponent<GunContainer>());
 
         NetworkServer.Spawn(gunContainer);
     }

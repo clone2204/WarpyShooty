@@ -1,6 +1,6 @@
 Win
 PlayerPath?
-E:/Will's_Good_Storage_Space/Shooty/TestBuild_Data/Shooty.exe
+C:/Users/jackinswp.APPD/Documents/GitHub/WarpyShooty/TestBuild_Data/Shooty.exe
 SceneListBegin?
 Assets/Scenes/TitleScreen.unity
 Assets/Scenes/Lobby.unity

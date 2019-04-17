@@ -73,6 +73,17 @@ public class PlayerHUDManager : MonoBehaviour
         gunInfoHUD.Find("Ammo Count").GetComponent<Text>().text = ammo + " / " + ammoPool;
     }
 
+    public void SetWeaponPickupName(string name)
+    {
+        Debug.LogWarning("NAME: " + name);
+        worldInfoHUD.Find("Player Interact").GetComponent<Text>().text = "Pickup " + name + ".";
+    }
+
+    public void ClearWeaponPickupName()
+    {
+        worldInfoHUD.Find("Player Interact").GetComponent<Text>().text = " ";
+    }
+
     public void SetToPlayerView()
     {
         observerCamera.enabled = false;

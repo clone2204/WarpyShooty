@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 public class EmptyAltFireBehavior : NetworkBehaviour, IAltFireBehavior
 {
-    public void Init(System.Func<int, bool> ConsumeAmmo, IPrimaryFireBehavior primaryFireBehavior, IReloadBehavior reloadBehavior)
+    public void Init(IPrimaryFireBehavior primaryFireBehavior, IAmmoBehavior reloadBehavior)
     {
         return;
     }

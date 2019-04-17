@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class StandardReloadBehavior : NetworkBehaviour, IReloadBehavior
+public class StandardAmmoBehavior : NetworkBehaviour, IAmmoBehavior
 {
+    [SerializeField] private int maxAmmoPool;
+    [SerializeField] private int maxAmmo;
+    [SerializeField] private int currentAmmoPool;
+    [SerializeField] private int currentAmmo;
+
     [SerializeField] private float reloadTime;
 
     private bool reloadActive;
     private bool reloadOnCountdown;
 
-    private System.Func<int, bool> TransferAmmo;
     private IPrimaryFireBehavior primaryFireBehavior;
     private IAltFireBehavior altFireBehavior;
 
-    public void Init(System.Func<int, bool> TransferAmmo, IPrimaryFireBehavior primaryFireBehavior, IAltFireBehavior altFireBehavior)
+    public void Init(IPrimaryFireBehavior primaryFireBehavior, IAltFireBehavior altFireBehavior)
     {
-        this.TransferAmmo = TransferAmmo;
         this.primaryFireBehavior = primaryFireBehavior;
         this.altFireBehavior = altFireBehavior;
 
@@ -42,6 +45,47 @@ public class StandardReloadBehavior : NetworkBehaviour, IReloadBehavior
         return reloadOnCountdown;
     }
 
+    public bool ConsumeAmmo(int amount)
+    {
+        if (currentAmmo <= 0)
+            return false;
+
+        currentAmmo -= amount;
+        return true;
+    }
+
+    public int GetCurrentAmmoPool()
+    {
+        return currentAmmoPool;
+    }
+
+    public int GetCurrentAmmo()
+    {
+        return currentAmmo;
+    }
+
+    public bool TransferAmmoFromPool(int amount)
+    {
+        if (amount == -1)
+        {
+            amount = maxAmmo;
+        }
+
+        if (amount > currentAmmoPool)
+        {
+            amount = currentAmmoPool;
+        }
+        else if ((amount + currentAmmo) > maxAmmo)
+        {
+            amount = maxAmmo - currentAmmo;
+        }
+
+        Debug.LogWarning("TRANSFER");
+        currentAmmoPool -= amount;
+        currentAmmo += amount;
+        return true;
+    }
+
     private IEnumerator ReloadCooldownCoroutine()
     {
         while (true)
@@ -55,7 +99,7 @@ public class StandardReloadBehavior : NetworkBehaviour, IReloadBehavior
                 yield return new WaitForSecondsRealtime(reloadTime);
 
                 Debug.LogWarning("...RELOADED!");
-                TransferAmmo(-1);
+                TransferAmmoFromPool(-1);
 
                 reloadOnCountdown = false;
 
