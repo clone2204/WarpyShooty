@@ -6,7 +6,7 @@ public interface IGameManager
 {
     void SetupGame(List<LobbyPlayerManager> players, int timeLimit, int KillLimit);
 
-    void LoadPlayer(LobbyPlayerManager lobbyPlayer, GamePlayerManager gamePlayer);
+    void LoadPlayer(LobbyPlayerManager lobbyPlayer, RealPlayer gamePlayer);
 
     void StartGame();
 

@@ -6,7 +6,7 @@ public interface IAltFireBehavior
 {
     void Init(IPrimaryFireBehavior primaryFireBehavior, IAmmoBehavior ammoBehavior);
 
-    void StartAltFire(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetLookDirection);
+    void StartAltFire(GamePlayer player, System.Func<Vector3> GetSpawnLocation);
 
     void StopAltFire();
 

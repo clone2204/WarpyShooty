@@ -194,7 +194,7 @@ public class LobbyManager_Server : NetworkBehaviour, ILobbyManager
         }
     }
 
-    public void PlayerLoaded(LobbyPlayerManager lobbyPlayer, GamePlayerManager gamePlayer)
+    public void PlayerLoaded(LobbyPlayerManager lobbyPlayer, RealPlayer gamePlayer)
     {
         readyPlayers[lobbyPlayer] = true;
         gameManager.LoadPlayer(lobbyPlayer, gamePlayer);

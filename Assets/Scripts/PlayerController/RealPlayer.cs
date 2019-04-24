@@ -3,23 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class GamePlayerManager : NetworkBehaviour
+public class RealPlayer : GamePlayer 
 {
-    private GameManager gameManager;
-
+    private Camera playerPOV;
     private PlayerHUDManager playerHUD;
     private IWarp warpManager;
-    private WeaponManager weaponManager;
-
+    
     [SyncVar] private string playerName;
-    [SyncVar] private GameManager.Team playerTeam;
-    [SyncVar] private int playerHealth;
-
 
     void Start()
     {
         gameManager = GameObject.Find("_SCRIPTS_").GetComponent<GameManager>();
 
+        playerPOV = GetComponentInChildren<Camera>();
         playerHUD = GameObject.Find("Menues").transform.Find("PlayerHud").GetComponent<PlayerHUDManager>();
         playerHUD.SetupCameras(GetComponentInChildren<Camera>());
 
@@ -54,26 +50,14 @@ public class GamePlayerManager : NetworkBehaviour
         return playerName;
     }
 
-    public GameManager.Team GetTeam()
+    public override void SetHealth(int health)
     {
-        return playerTeam;
-    }
+        base.SetHealth(health);
 
-    public void SetHealth(int health)
-    {
-        if (!isServer)
-            return;
-
-        playerHealth = health;
         TargetUpdatePlayerHealth(connectionToClient);
     }
 
-    public int GetHealth()
-    {
-        return playerHealth;
-    }
-
-    public void DamagePlayer(int damage, GamePlayerManager damager)
+    public override void DamagePlayer(int damage, GamePlayer damager)
     {
         if (!isServer)
             return;
@@ -84,9 +68,22 @@ public class GamePlayerManager : NetworkBehaviour
         playerHealth -= damage;
         TargetUpdatePlayerHealth(connectionToClient);
 
+        if (!(damager is RealPlayer))
+            return;
+
         if (playerHealth <= 0)
-            gameManager.KillPlayer(this, damager);
+            base.gameManager.KillPlayer(this, (RealPlayer)damager);
     }
+
+    public override Vector3 GetPlayerLookDirection()
+    {
+        float xrot = Mathf.Sin(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
+        float zrot = Mathf.Cos(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
+        float yrot = -Mathf.Sin(Mathf.Deg2Rad * playerPOV.transform.rotation.eulerAngles.x);
+
+        return new Vector3(xrot, yrot, zrot);
+    }
+
 
     public void EnablePlayer()
     {
@@ -110,46 +107,6 @@ public class GamePlayerManager : NetworkBehaviour
     public void WarpPlayerToLocation(Warp.Location location)
     {
         WarpPlayerToLocation(location);
-    }
-
-    public void StartPrimaryFire()
-    {
-        weaponManager.StartPrimaryFire(this);
-    }
-
-    public void StopPrimaryFire()
-    {
-        weaponManager.StopPrimaryFire();
-    }
-
-    public void StartAltFire()
-    {
-        weaponManager.StartAltFire(this);
-    }
-
-    public void StopAltFire()
-    {
-        weaponManager.StopAltFire();
-    }
-
-    public void StartReload()
-    {
-        weaponManager.StartReload();
-    }
-
-    public void StopReload()
-    {
-        weaponManager.StopReload();
-    }
-
-    public void StartWeaponPickup()
-    {
-        weaponManager.StartWeaponPickup();
-    }
-
-    public void StopWeaponPickup()
-    {
-        weaponManager.StopWeaponPickup();
     }
 
     //=================================================================================================

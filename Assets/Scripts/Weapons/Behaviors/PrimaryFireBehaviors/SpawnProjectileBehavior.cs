@@ -18,10 +18,9 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
     private IAltFireBehavior altFireBehavior;
     private IAmmoBehavior ammoBehavior;
 
-    private GamePlayerManager player;
+    private GamePlayer player;
     private Func<Vector3> GetSpawnLocation;
-    private Func<Vector3> GetLookDirection;
-
+    
     public void Init(IAltFireBehavior altFireBehavior, IAmmoBehavior ammoBehavior)
     {
         this.altFireBehavior = altFireBehavior;
@@ -33,13 +32,12 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
         StartCoroutine(RefireCooldownCoroutine());
     }
 
-    public void PrimaryFireStart(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, Func<Vector3> GetLookDirection)
+    public void PrimaryFireStart(GamePlayer player, System.Func<Vector3> GetSpawnLocation)
     {
         primaryFireActive = true;
 
         this.player = player;
         this.GetSpawnLocation = GetSpawnLocation;
-        this.GetLookDirection = GetLookDirection;
     }
 
     public void PrimaryFireStop()
@@ -48,7 +46,6 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
 
         this.player = null;
         this.GetSpawnLocation = null;
-        this.GetLookDirection = null;
     }
 
     public bool GetPrimaryFireActive()

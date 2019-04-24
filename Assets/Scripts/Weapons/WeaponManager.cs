@@ -4,8 +4,6 @@ using System.Collections;
 
 public class WeaponManager : NetworkBehaviour
 {
-    private Camera playerPOV;
-    private PlayerHUDManager playerHud;
     private Transform weaponPort;
 
     [SerializeField] private GameObject startingWeapon;
@@ -20,9 +18,19 @@ public class WeaponManager : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
-        playerPOV = GetComponentInChildren<Camera>();
+        transform.fin
         playerHud = GameObject.Find("_SCRIPTS_").GetComponentInChildren<PlayerHUDManager>();
-        weaponPort = playerPOV.transform.Find("WeaponPort").transform;
+
+        if (playerPOV != null)
+        {
+            weaponPort = playerPOV.transform.Find("WeaponPort").transform;
+        }
+        else
+        {
+            weaponPort = transform.Find("WeaponPort").transform;
+        }
+
+        Debug.LogWarning(weaponPort);
 
         if (isServer)
         {
@@ -44,9 +52,9 @@ public class WeaponManager : NetworkBehaviour
     //Interface Functions
     //=================================================================================================
 
-    public void StartPrimaryFire(GamePlayerManager player)
+    public void StartPrimaryFire(GamePlayer player)
     {
-        currentWeapon.StartPrimaryFire(player, GetBulletSpawnLocation, GetLookDirection);
+        currentWeapon.StartPrimaryFire(player, GetBulletSpawnLocation);
     }
 
     public void StopPrimaryFire()
@@ -54,9 +62,9 @@ public class WeaponManager : NetworkBehaviour
         currentWeapon.StopPrimaryFire();
     }
 
-    public void StartAltFire(GamePlayerManager player)
+    public void StartAltFire(GamePlayer player)
     {
-        currentWeapon.StartAltFire(player, GetBulletSpawnLocation, GetLookDirection);
+        currentWeapon.StartAltFire(player, GetBulletSpawnLocation);
     }
 
     public void StopAltFire()
@@ -112,15 +120,7 @@ public class WeaponManager : NetworkBehaviour
     //Helper Functions
     //=================================================================================================
 
-    private Vector3 GetLookDirection()
-    {
-        float xrot = Mathf.Sin(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
-        float zrot = Mathf.Cos(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
-        float yrot = -Mathf.Sin(Mathf.Deg2Rad * playerPOV.transform.rotation.eulerAngles.x);
-
-        return new Vector3(xrot, yrot, zrot);
-    }
-
+    
     private Vector3 GetBulletSpawnLocation()
     {
         float initialX = this.transform.position.x;

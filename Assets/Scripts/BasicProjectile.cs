@@ -9,12 +9,12 @@ public class BasicProjectile : NetworkBehaviour, IProjectile
 
     private Rigidbody projectilePhysics;
 
-    private GamePlayerManager owner;
+    private RealPlayer owner;
     private Vector3 direction;
     private float velocity;
     private int damage;
     
-    public void Init(GamePlayerManager owner, Vector3 direction, float velocity, int damage)
+    public void Init(RealPlayer owner, Vector3 direction, float velocity, int damage)
     {
         projectilePhysics = this.GetComponent<Rigidbody>();
 
@@ -29,12 +29,13 @@ public class BasicProjectile : NetworkBehaviour, IProjectile
 
     void OnTriggerEnter(Collider other)
     {
+        IDamageEntity targetPlayer = other.GetComponent<IDamageEntity>();
 
-        if ((other.gameObject.tag == "localPlayer" || other.gameObject.tag == "Player") && isServer)
+        if (targetPlayer != null && isServer)
         {
-            GamePlayerManager targetPlayer = other.GetComponent<GamePlayerManager>();
             targetPlayer.DamagePlayer(damage, owner);
         }
+
         DestroyBulletInSeconds(0);
     }
 

@@ -11,7 +11,7 @@ public class EmptyAltFireBehavior : NetworkBehaviour, IAltFireBehavior
         return;
     }
 
-    public void StartAltFire(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, Func<Vector3> GetLookDirection)
+    public void StartAltFire(RealPlayer player, System.Func<Vector3> GetSpawnLocation, Func<Vector3> GetLookDirection)
     {
         return;
     }
