@@ -4,10 +4,8 @@ using System.Collections;
 
 public class WeaponSpawner : NetworkBehaviour
 {
-    private GameObject containerPrefab;
-    private GameObject gunContainer;
-    private GunContainer gunContainerScript;
-
+    [SerializeField] private GameObject containerPrefab;
+    
     public GameObject weapon;
 
 	// Use this for initialization
@@ -28,12 +26,12 @@ public class WeaponSpawner : NetworkBehaviour
 
     public void SpawnWeapon()
     {
-        gunContainer = (GameObject)Instantiate(containerPrefab, transform.position, new Quaternion());
-        gunContainerScript = gunContainer.GetComponent<GunContainer>();
+        GameObject gunContainer = (GameObject)Instantiate(containerPrefab, transform.position, new Quaternion());
+        GunContainer gunContainerScript = gunContainer.GetComponent<GunContainer>();
 
-        //gunContainerScript.SetContainedGun((GameObject)Instantiate(weapon).GetComponent<GunContainer>());
+        gunContainerScript.SetContainedGun(((GameObject)Instantiate(weapon)).GetComponent<IWeapon>());
 
-        NetworkServer.Spawn(gunContainer);
+        //NetworkServer.Spawn(gunContainer);
     }
 	
 	

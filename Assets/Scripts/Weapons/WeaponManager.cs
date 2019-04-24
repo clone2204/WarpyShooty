@@ -8,7 +8,7 @@ public class WeaponManager : NetworkBehaviour
     private PlayerHUDManager playerHud;
     private Transform weaponPort;
 
-    public IWeapon startingWeapon;
+    [SerializeField] private GameObject startingWeapon;
     private IWeapon currentWeapon;
 
     public GameObject gunContainerPrefab;
@@ -24,17 +24,19 @@ public class WeaponManager : NetworkBehaviour
         playerHud = GameObject.Find("_SCRIPTS_").GetComponentInChildren<PlayerHUDManager>();
         weaponPort = playerPOV.transform.Find("WeaponPort").transform;
 
-        StartCoroutine(SwapWeaponCoroutine(gunSwapHoldTimeMS));
-
-        if(isServer)
-            CmdSetGunToStarter();
+        if (isServer)
+        {
+            StartCoroutine(SwapWeaponCoroutine(gunSwapHoldTimeMS));
+            SpawnStartingWeapon();
+        }
     }
 
     private void Update()
     {
         if(Input.GetKeyDown("`"))
         {
-            CmdDropCurrentWeapon();
+            //CmdDropCurrentWeapon();
+            DropCurrentWeapon();
         }
     }
 
@@ -80,12 +82,12 @@ public class WeaponManager : NetworkBehaviour
         return currentWeapon.GetWeaponName();
     }
 
-    public int GetWeaponMaxAmmo()
+    public int GetWeaponAmmoPool()
     {
         if (currentWeapon == null)
             return 0;
 
-        return currentWeapon.GetAmmoPool();
+        return currentWeapon.GetCurrentAmmoPool();
     }
 
     public int GetWeaponCurrentAmmo()
@@ -93,7 +95,7 @@ public class WeaponManager : NetworkBehaviour
         if (currentWeapon == null)
             return 0;
 
-        return currentWeapon.GetWeaponAmmo();
+        return currentWeapon.GetCurrentAmmo();
     }
 
     public void StartWeaponPickup()
@@ -146,7 +148,7 @@ public class WeaponManager : NetworkBehaviour
 
             if (currentTime >= holdTime)
             {
-                CmdSwapGun();
+                SwapGun();
             }
         }
     }
@@ -164,99 +166,91 @@ public class WeaponManager : NetworkBehaviour
     //Server Functions
     //=================================================================================================
 
-
-    private void SetGunToStarter()
+    public void SpawnStartingWeapon()
     {
-        GameObject gun = (GameObject)Instantiate((GameObject)startGun);
-        SetPlayersGun(gun);
+        if (startingWeapon.GetComponent<IWeapon>() == null)
+            return;
 
-        NetworkServer.Spawn(gun);
-
-        RpcUpdatePlayerGun(gun.GetComponent<NetworkIdentity>().netId);
+        IWeapon weapon = ((GameObject)Instantiate(startingWeapon)).GetComponent<IWeapon>();
+        SetWeapon(weapon);
     }
 
+    public void SetWeapon(IWeapon weapon)
+    {
+        this.currentWeapon = weapon;
+        currentWeapon.SetWeaponPosition(weaponPort);
+    }
+
+    public void DropCurrentWeapon()
+    {
+        GunContainer dropGunContainer = ((GameObject)Instantiate(gunContainerPrefab, GetBulletSpawnLocation(), new Quaternion())).GetComponent<GunContainer>();
+        dropGunContainer.SetContainedGun(currentWeapon);
+
+        currentWeapon = null;
+    }
+
+    
     public void SwapGun()
     {
-        GunContainer newGunContainer = ((GameObject)Instantiate(gunContainerPrefab, GetBulletSpawnLocation(), new Quaternion())).GetComponent<GunContainer>();
-        
-        GameObject oldGunContainer = swapableGunContainer;
-        GunContainer oldGunContainerScript = oldGunContainer.GetComponent<GunContainer>();
+        DropCurrentWeapon();
 
-        GameObject oldGun = currentGun;
-        GunBase oldGunScript = oldGun.GetComponent<GunBase>();
+        GunContainer pickupGunContainer = swapableGunContainer;
+        SetWeapon(pickupGunContainer.GetContainedGun());
 
-        GameObject newGun = oldGunContainerScript.containedGun;
-        GunBase newGunScript = newGun.GetComponent<GunBase>();
+        pickupGunContainer.DestroyContainer();
 
-        newGunContainerScript.SetContainedGun(oldGun);
-        SetPlayersGun(newGun);
-
-        Destroy(oldGunContainer);
-        NetworkServer.Spawn(newGunContainer);
-        newGunContainer.GetComponent<Rigidbody>().AddForce(GetLookRotation(), ForceMode.Acceleration);
-
-        NetworkInstanceId containerID = gunContainerPrefab.GetComponent<NetworkIdentity>().netId;
-
-        RpcUpdatePlayerGun(GetComponent<NetworkIdentity>().netId, newGun.GetComponent<NetworkIdentity>().netId, newGunScript.ammoData);
-        RpcUpdateContainerGun(newGunContainer.GetComponent<NetworkIdentity>().netId, oldGun.GetComponent<NetworkIdentity>().netId, oldGunScript.ammoData);
-    }
-
-    [Command]
-    public void CmdDropCurrentWeapon()
-    {
-        GameObject newGunContainer = (GameObject)Instantiate(this.gunContainerPrefab, GetBulletSpawnLocation(), new Quaternion());
-        GunContainer newGunContainerScript = newGunContainer.GetComponent<GunContainer>();
-
-        GameObject oldGun = currentGunObject;
-        IGun oldGunScript = oldGun.GetComponent<IGun>();
-
-        //newGunContainerScript.SetContainedGun(oldGun);
-
-        NetworkServer.Spawn(newGunContainer);
-
-        currentGunObject = null;
-        currentGun = null;
-        
+        //RpcUpdatePlayerGun(GetComponent<NetworkIdentity>().netId, newGun.GetComponent<NetworkIdentity>().netId, newGunScript.ammoData);
         //RpcUpdateContainerGun(newGunContainer.GetComponent<NetworkIdentity>().netId, oldGun.GetComponent<NetworkIdentity>().netId, oldGunScript.ammoData);
     }
+
+    //[Command]
+    //public void CmdDropCurrentWeapon()
+    //{
+    //    GameObject newGunContainer = (GameObject)Instantiate(this.gunContainerPrefab, GetBulletSpawnLocation(), new Quaternion());
+    //    GunContainer newGunContainerScript = newGunContainer.GetComponent<GunContainer>();
+
+    //    GameObject oldGun = currentGunObject;
+    //    IGun oldGunScript = oldGun.GetComponent<IGun>();
+
+    //    //newGunContainerScript.SetContainedGun(oldGun);
+
+    //    NetworkServer.Spawn(newGunContainer);
+
+    //    currentGunObject = null;
+    //    currentGun = null;
+        
+    //    //RpcUpdateContainerGun(newGunContainer.GetComponent<NetworkIdentity>().netId, oldGun.GetComponent<NetworkIdentity>().netId, oldGunScript.ammoData);
+    //}
 
     //=================================================================================================
     //Client Functions
     //=================================================================================================
 
 
-    [ClientRpc]
-    public void RpcUpdatePlayerGun(NetworkInstanceId gunID)
-    {
-        if (isServer)
-            return;
+    //[ClientRpc]
+    //public void RpcUpdatePlayerGun(NetworkInstanceId gunID)
+    //{
+    //    if (isServer)
+    //        return;
 
-        SetPlayersGun(ClientScene.FindLocalObject(gunID));
-    }
+    //    SetPlayersGun(ClientScene.FindLocalObject(gunID));
+    //}
 
-    [ClientRpc]
-    public void RpcUpdateContainerGun(NetworkInstanceId containerID, NetworkInstanceId gunID, GunBase.AmmoData ammoData)
-    {
-        if (isServer)
-            return;
+    //[ClientRpc]
+    //public void RpcUpdateContainerGun(NetworkInstanceId containerID, NetworkInstanceId gunID, GunBase.AmmoData ammoData)
+    //{
+    //    if (isServer)
+    //        return;
 
-        GameObject gunContainerPrefab = ClientScene.FindLocalObject(containerID);
-        GunContainer gunContainerScript = gunContainerPrefab.GetComponent<GunContainer>();
+    //    GameObject gunContainerPrefab = ClientScene.FindLocalObject(containerID);
+    //    GunContainer gunContainerScript = gunContainerPrefab.GetComponent<GunContainer>();
 
-        gunContainerScript.SetContainedGun(ClientScene.FindLocalObject(gunID));
+    //    gunContainerScript.SetContainedGun(ClientScene.FindLocalObject(gunID));
 
-        GunBase containerGunScript = gunContainerScript.containedGun.GetComponent<GunBase>();
-        containerGunScript.ammoData = ammoData;
+    //    GunBase containerGunScript = gunContainerScript.containedGun.GetComponent<GunBase>();
+    //    containerGunScript.ammoData = ammoData;
 
-    }
-
-
-
-
-
-
-
-
+    //}
 
     //Sets the gun container that the player is currently able to pick up
     public void SetSwappableGunContainer(GunContainer gunContainer)
@@ -264,7 +258,9 @@ public class WeaponManager : NetworkBehaviour
         this.swapableGunContainer = gunContainer;
         if (gunContainer == null || gunContainer.GetContainedGun() == null)
         {
-            Debug.LogWarning("Container: " + gunContainer + " || Gun: " + gunContainer.GetContainedGun());
+            //Debug.LogWarning("Container: " + gunContainer);
+            //Debug.LogWarning("Gun: " + gunContainer.GetContainedGun().GetWeaponName());
+
             playerHud.ClearWeaponPickupName();
         }
         else

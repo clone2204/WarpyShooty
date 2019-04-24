@@ -7,8 +7,6 @@ public class LocalPlayerController : NetworkBehaviour
     private CharacterController characterController;
     private GamePlayerManager playerManager;
 
-    private GunManager gunManager;
-
     [SerializeField] private float playerSpeed;
     [SerializeField] private float jumpSpeed;
     [SerializeField] private float gravity;
@@ -29,8 +27,6 @@ public class LocalPlayerController : NetworkBehaviour
 
         characterController = GetComponent<CharacterController>();
         playerManager = GetComponent<GamePlayerManager>();
-
-        gunManager = GetComponent<GunManager>();
 
         jumpsLeft = jumps;
     }
@@ -81,7 +77,11 @@ public class LocalPlayerController : NetworkBehaviour
 
         if (Input.GetKeyDown("e"))
         {
-            //this.gunManager.SwapGun();
+            playerManager.StartWeaponPickup();
+        }
+        if(Input.GetKeyUp("e"))
+        {
+            playerManager.StopWeaponPickup();
         }
 
         if (Input.GetKeyDown("q"))

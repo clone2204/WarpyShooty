@@ -64,14 +64,14 @@ public class StandardAmmoBehavior : NetworkBehaviour, IAmmoBehavior
         return currentAmmo;
     }
 
-    public bool TransferAmmoFromPool(int amount)
+    private bool TransferAmmoFromPool(int amount)
     {
         if (amount == -1)
         {
             amount = maxAmmo;
         }
 
-        if (amount > currentAmmoPool)
+        if (amount > currentAmmoPool) //Need to fix reload bug
         {
             amount = currentAmmoPool;
         }

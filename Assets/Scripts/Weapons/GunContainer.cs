@@ -4,30 +4,30 @@ using System.Collections;
 
 public class GunContainer : NetworkBehaviour {
 
-    [SerializeField] private Gun containedGun;
+    private IWeapon containerWeapon;
     
     // Use this for initialization
     void Start ()
     {
-
+        
     }
 	
 	// Update is called once per frame
 	void FixedUpdate ()
     {
-        if (this.containedGun != null)
+        if (this.containerWeapon != null)
             MoveGun();
 	}
 
     private void MoveGun()
     {
-        containedGun.transform.Rotate(Vector3.up, 1f);
-        containedGun.transform.localPosition = new Vector3(0, .7f + Mathf.Sin(Time.time) / 8, 0); 
+        containerWeapon.GetWeaponObject().transform.Rotate(Vector3.up, 1f);
+        containerWeapon.GetWeaponObject().transform.localPosition = new Vector3(0, .7f + Mathf.Sin(Time.time) / 8, 0); 
     }
 
     void OnTriggerEnter(Collider col)
     {
-        GunManager playerGunManager = col.GetComponent<GunManager>();
+        WeaponManager playerGunManager = col.GetComponent<WeaponManager>();
 
         if (playerGunManager == null)
             return;
@@ -38,7 +38,7 @@ public class GunContainer : NetworkBehaviour {
 
     void OnTriggerExit(Collider col)
     {
-        GunManager playerGunManager = col.GetComponent<GunManager>();
+        WeaponManager playerGunManager = col.GetComponent<WeaponManager>();
 
         if (playerGunManager == null)
             return;
@@ -48,24 +48,23 @@ public class GunContainer : NetworkBehaviour {
 
     }
 
-    public void SetContainedGun(Gun gun)
+    public void SetContainedGun(IWeapon weapon)
     {
-        if (gun == null)
+        if (weapon == null)
             return;
 
-        containedGun = gun;
-        containedGun.transform.parent = transform;
-        containedGun.transform.localPosition = new Vector3(0, .7f, 0);
+        containerWeapon = weapon;
+        weapon.SetWeaponPosition(transform);
     }
 
-    public Gun GetContainedGun()
+    public IWeapon GetContainedGun()
     {
-        return this.containedGun;
+        return this.containerWeapon;
     }
 
     public void DestroyContainer()
     {
-        containedGun = null;
+        containerWeapon = null;
         GameObject.Destroy(this.gameObject);
     }
 }

@@ -9,7 +9,7 @@ public class GamePlayerManager : NetworkBehaviour
 
     private PlayerHUDManager playerHUD;
     private IWarp warpManager;
-    private GunManager gunManager;
+    private WeaponManager weaponManager;
 
     [SyncVar] private string playerName;
     [SyncVar] private GameManager.Team playerTeam;
@@ -24,13 +24,13 @@ public class GamePlayerManager : NetworkBehaviour
         playerHUD.SetupCameras(GetComponentInChildren<Camera>());
 
         warpManager = GetComponent<Warp>();
-        gunManager = GetComponent<GunManager>();
+        weaponManager = GetComponent<WeaponManager>();
     }
 
     private void Update()
     {
-        playerHUD.SetWeaponName(gunManager.GetWeaponName());
-        playerHUD.SetWeaponAmmo(gunManager.GetWeaponCurrentAmmo(), gunManager.GetWeaponMaxAmmo());
+        playerHUD.SetWeaponName(weaponManager.GetWeaponName());
+        playerHUD.SetWeaponAmmo(weaponManager.GetWeaponCurrentAmmo(), weaponManager.GetWeaponAmmoPool());
     }
 
     //=================================================================================================
@@ -114,42 +114,42 @@ public class GamePlayerManager : NetworkBehaviour
 
     public void StartPrimaryFire()
     {
-        gunManager.StartPrimaryFire(this);
+        weaponManager.StartPrimaryFire(this);
     }
 
     public void StopPrimaryFire()
     {
-        gunManager.StopPrimaryFire();
+        weaponManager.StopPrimaryFire();
     }
 
     public void StartAltFire()
     {
-        gunManager.StartAltFire(this);
+        weaponManager.StartAltFire(this);
     }
 
     public void StopAltFire()
     {
-        gunManager.StopAltFire();
+        weaponManager.StopAltFire();
     }
 
     public void StartReload()
     {
-        gunManager.StartReload();
+        weaponManager.StartReload();
     }
 
     public void StopReload()
     {
-        gunManager.StopReload();
+        weaponManager.StopReload();
     }
 
     public void StartWeaponPickup()
     {
-        gunManager.StartWeaponPickup();
+        weaponManager.StartWeaponPickup();
     }
 
     public void StopWeaponPickup()
     {
-        gunManager.StopWeaponPickup();
+        weaponManager.StopWeaponPickup();
     }
 
     //=================================================================================================
