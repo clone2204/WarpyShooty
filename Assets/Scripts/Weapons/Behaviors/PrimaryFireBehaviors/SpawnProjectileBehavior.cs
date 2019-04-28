@@ -40,6 +40,7 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
 
         this.player = player;
         this.GetSpawnLocation = GetSpawnLocation;
+        this.GetSpawnDirection = GetSpawnDirection;
     }
 
     public void PrimaryFireStop()

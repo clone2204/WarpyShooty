@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public abstract class GamePlayer : NetworkBehaviour
+public class GamePlayer : NetworkBehaviour
 {
     private Camera playerPOV;
     private PlayerHUDManager playerHUD;
     private IWarp warpManager;
 
     [SyncVar] private string playerName;
-    [SerializeField] [SyncVar] protected int playerHealth;
-    [SerializeField] [SyncVar] protected GameManager.Team playerTeam;
+    [SyncVar] protected int playerHealth;
+    [SyncVar] protected GameManager.Team playerTeam;
 
     protected GameManager gameManager;
     protected WeaponManager weaponManager;
