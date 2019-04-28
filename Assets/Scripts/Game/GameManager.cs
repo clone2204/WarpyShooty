@@ -8,7 +8,7 @@ public class GameManager : NetworkBehaviour, IGameManager
     
     private List<LobbyPlayerManager> lobbyPlayers;
     private int playerCount;
-    private Dictionary<RealPlayer, int> gamePlayers;
+    private Dictionary<GamePlayer, int> gamePlayers;
 
     private int blueKills;
     private int redKills;
@@ -50,7 +50,7 @@ public class GameManager : NetworkBehaviour, IGameManager
 
         this.gameTime = timeLimit * 60;
         this.lobbyPlayers = players;
-        this.gamePlayers = new Dictionary<RealPlayer, int>();
+        this.gamePlayers = new Dictionary<GamePlayer, int>();
 
         playerCount = 0;
         foreach (LobbyPlayerManager player in lobbyPlayers)
@@ -60,7 +60,7 @@ public class GameManager : NetworkBehaviour, IGameManager
         }
     }
 
-    public void LoadPlayer(LobbyPlayerManager lobbyPlayer, RealPlayer gamePlayer)
+    public void LoadPlayer(LobbyPlayerManager lobbyPlayer, GamePlayer gamePlayer)
     {
         StartCoroutine(WaitForPlayerLoad(this.lobbyPlayers, this.gamePlayers, lobbyPlayer, gamePlayer));
     }
@@ -75,7 +75,7 @@ public class GameManager : NetworkBehaviour, IGameManager
         this.spawnPoints = LoadSpawnPoints();
 
         Debug.LogWarning("Gameplayers: " + gamePlayers.Keys.Count);
-        foreach (RealPlayer gamePlayer in gamePlayers.Keys)
+        foreach (GamePlayer gamePlayer in gamePlayers.Keys)
         {
             Debug.LogWarning("Spawn Player");
             SpawnPlayer(gamePlayer);
@@ -89,7 +89,7 @@ public class GameManager : NetworkBehaviour, IGameManager
         return gameTime;
     }
 
-    private void SpawnPlayer(RealPlayer player)
+    private void SpawnPlayer(GamePlayer player)
     {
         GameManager.Team playerTeam = player.GetTeam();
 
@@ -103,14 +103,14 @@ public class GameManager : NetworkBehaviour, IGameManager
         player.EnablePlayer();
     }
 
-    private void DespawnPlayer(RealPlayer player)
+    private void DespawnPlayer(GamePlayer player)
     {
         player.transform.position = new Vector3(0, 10, 0);
 
         player.DisablePlayer();
     }
 
-    public void KillPlayer(RealPlayer player, GamePlayer killer)
+    public void KillPlayer(GamePlayer player, GamePlayer killer)
     {
         if (killer != null)
         {
@@ -129,12 +129,11 @@ public class GameManager : NetworkBehaviour, IGameManager
             }
         }
 
-<<<<<<< HEAD
         DespawnPlayer(player);
         StartCoroutine(RespawnTimer(player));
     }
 
-    public void PlayerScore(GamePlayerManager player, int scoreInc)
+    public void PlayerScore(GamePlayer player, int scoreInc)
     {
         if (player == null)
             return;
@@ -148,33 +147,10 @@ public class GameManager : NetworkBehaviour, IGameManager
         {
             redKills++;
         }
-=======
-        PlayerScore(killer);
 
-        if(blueKills >= killLimit || redKills >= killLimit)
-        {
-            EndGame();
-        }
-
-        DespawnPlayer(player);
-        StartCoroutine(RespawnTimer(player));
->>>>>>> c472e59ab410daa365ce01237f6b64f3b06c7e48
     }
 
-    public void PlayerScore(GamePlayer player)
-    {
-        gamePlayers[player]++;
-        if (player.GetTeam() == Team.Blue)
-        {
-            blueKills++;
-        }
-        else if (player.GetTeam() == Team.Red)
-        {
-            redKills++;
-        }
-    }
-
-    private IEnumerator RespawnTimer(RealPlayer player)
+    private IEnumerator RespawnTimer(GamePlayer player)
     {
         yield return new WaitForSecondsRealtime(respawnTime);
 
@@ -192,7 +168,7 @@ public class GameManager : NetworkBehaviour, IGameManager
         List<int> blueScores = new List<int>();
         List<int> redScores = new List<int>();
 
-        foreach (RealPlayer player in gamePlayers.Keys)
+        foreach (GamePlayer player in gamePlayers.Keys)
         {
             string name = player.GetName();
             int score = gamePlayers[player];
@@ -296,7 +272,7 @@ public class GameManager : NetworkBehaviour, IGameManager
             EndGame();
     }
 
-    private IEnumerator WaitForPlayerLoad(List<LobbyPlayerManager> lobbyPlayers, Dictionary<RealPlayer, int> gamePlayers, LobbyPlayerManager lobbyPlayer, RealPlayer gamePlayer)
+    private IEnumerator WaitForPlayerLoad(List<LobbyPlayerManager> lobbyPlayers, Dictionary<GamePlayer, int> gamePlayers, LobbyPlayerManager lobbyPlayer, GamePlayer gamePlayer)
     {
         yield return new WaitUntil(() => gamePlayer.isServer);
 

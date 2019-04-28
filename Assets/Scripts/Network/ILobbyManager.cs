@@ -23,7 +23,7 @@ public interface ILobbyManager
 
     void StartGame();
 
-    void PlayerLoaded(LobbyPlayerManager lobbyPlayer, GamePlayerManager gameManager);
+    void PlayerLoaded(LobbyPlayerManager lobbyPlayer, GamePlayer gameManager);
 
     void EndGame();
 }

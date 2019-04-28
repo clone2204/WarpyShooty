@@ -23,6 +23,7 @@ public class WeaponManager : NetworkBehaviour
         playerPOV = GetComponentInChildren<Camera>();
         playerHud = GameObject.Find("_SCRIPTS_").GetComponentInChildren<PlayerHUDManager>();
         weaponPort = playerPOV.transform.Find("WeaponPort").transform;
+        
 
         if (isServer)
         {
@@ -44,9 +45,9 @@ public class WeaponManager : NetworkBehaviour
     //Interface Functions
     //=================================================================================================
 
-    public void StartPrimaryFire(GamePlayerManager player)
+    public void StartPrimaryFire(GamePlayer player)
     {
-        currentWeapon.StartPrimaryFire(player, GetBulletSpawnLocation, GetLookDirection);
+        currentWeapon.StartPrimaryFire(player, GetSpawnLocation, GetSpawnDirection);
     }
 
     public void StopPrimaryFire()
@@ -54,9 +55,9 @@ public class WeaponManager : NetworkBehaviour
         currentWeapon.StopPrimaryFire();
     }
 
-    public void StartAltFire(GamePlayerManager player)
+    public void StartAltFire(GamePlayer player)
     {
-        currentWeapon.StartAltFire(player, GetBulletSpawnLocation, GetLookDirection);
+        currentWeapon.StartAltFire(player, GetSpawnLocation, GetSpawnDirection);
     }
 
     public void StopAltFire()
@@ -112,7 +113,8 @@ public class WeaponManager : NetworkBehaviour
     //Helper Functions
     //=================================================================================================
 
-    private Vector3 GetLookDirection()
+
+    private Vector3 GetSpawnDirection()
     {
         float xrot = Mathf.Sin(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
         float zrot = Mathf.Cos(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
@@ -121,13 +123,13 @@ public class WeaponManager : NetworkBehaviour
         return new Vector3(xrot, yrot, zrot);
     }
 
-    private Vector3 GetBulletSpawnLocation()
+    private Vector3 GetSpawnLocation()
     {
         float initialX = this.transform.position.x;
         float initialY = this.transform.position.y + .7f;
         float initialZ = this.transform.position.z;
 
-        Vector3 rotation = GetLookDirection();
+        Vector3 rotation = GetSpawnDirection();
 
         return new Vector3(initialX + rotation.x, initialY + rotation.y, initialZ + rotation.z);
     }
@@ -183,7 +185,7 @@ public class WeaponManager : NetworkBehaviour
 
     public void DropCurrentWeapon()
     {
-        GunContainer dropGunContainer = ((GameObject)Instantiate(gunContainerPrefab, GetBulletSpawnLocation(), new Quaternion())).GetComponent<GunContainer>();
+        GunContainer dropGunContainer = ((GameObject)Instantiate(gunContainerPrefab, GetSpawnLocation(), new Quaternion())).GetComponent<GunContainer>();
         dropGunContainer.SetContainedGun(currentWeapon);
 
         currentWeapon = null;

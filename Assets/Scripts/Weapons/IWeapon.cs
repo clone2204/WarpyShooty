@@ -15,11 +15,11 @@ public interface IWeapon
 
     int GetCurrentAmmo();
 
-    void StartPrimaryFire(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetLookDirection);
+    void StartPrimaryFire(GamePlayer player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetSpawnDirection);
 
     void StopPrimaryFire();
 
-    void StartAltFire(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetLookDirection);
+    void StartAltFire(GamePlayer player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetSpawnDirection);
 
     void StopAltFire();
 

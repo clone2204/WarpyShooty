@@ -18,9 +18,10 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
     private IAltFireBehavior altFireBehavior;
     private IAmmoBehavior ammoBehavior;
 
-    private GamePlayerManager player;
+    private GamePlayer player;
     private Func<Vector3> GetSpawnLocation;
-    private Func<Vector3> GetLookDirection;
+    private Func<Vector3> GetSpawnDirection;
+
 
     public void Init(IAltFireBehavior altFireBehavior, IAmmoBehavior ammoBehavior)
     {
@@ -33,13 +34,12 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
         StartCoroutine(RefireCooldownCoroutine());
     }
 
-    public void PrimaryFireStart(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, Func<Vector3> GetLookDirection)
+    public void PrimaryFireStart(GamePlayer player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetSpawnDirection)
     {
         primaryFireActive = true;
 
         this.player = player;
         this.GetSpawnLocation = GetSpawnLocation;
-        this.GetLookDirection = GetLookDirection;
     }
 
     public void PrimaryFireStop()
@@ -48,7 +48,6 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
 
         this.player = null;
         this.GetSpawnLocation = null;
-        this.GetLookDirection = null;
     }
 
     public bool GetPrimaryFireActive()
@@ -68,11 +67,9 @@ public class SpawnProjectileBehavior : NetworkBehaviour, IPrimaryFireBehavior
 
                 if(ammoBehavior.ConsumeAmmo(1))
                 {
-                    //This method is not working
-                    //Probably need to init projectile after spawning it
                     GameObject newProjectile = Instantiate<GameObject>(projectile, GetSpawnLocation(), new Quaternion());
                     IProjectile projectileScript = newProjectile.GetComponent<IProjectile>();
-                    projectileScript.Init(player, GetLookDirection(), projectileVelocity, projectileDamage);
+                    projectileScript.Init(player, GetSpawnDirection(), projectileVelocity, projectileDamage);
 
                     NetworkServer.Spawn(newProjectile);
                 }

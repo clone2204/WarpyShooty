@@ -5,7 +5,7 @@ using System.Collections;
 public class LocalPlayerController : NetworkBehaviour
 {
     private CharacterController characterController;
-    private GamePlayerManager playerManager;
+    private GamePlayer playerManager;
 
     [SerializeField] private float playerSpeed;
     [SerializeField] private float jumpSpeed;
@@ -26,7 +26,7 @@ public class LocalPlayerController : NetworkBehaviour
         }
 
         characterController = GetComponent<CharacterController>();
-        playerManager = GetComponent<GamePlayerManager>();
+        playerManager = GetComponent<GamePlayer>();
 
         jumpsLeft = jumps;
     }
