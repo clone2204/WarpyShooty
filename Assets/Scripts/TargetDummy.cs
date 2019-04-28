@@ -39,7 +39,7 @@ public class TargetDummy : NetworkBehaviour
         
     }
 
-    public void DamageDummy(GamePlayerManager attacker, int damage)
+    public void DamageDummy(GamePlayer attacker, int damage)
     {
         dummyHealth -= damage;
 

@@ -131,7 +131,7 @@ public class NetworkManager : NetworkLobbyManager
     public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
     {
         LobbyPlayerManager lobbyPlayerManager = lobbyPlayer.GetComponent<LobbyPlayerManager>();
-        GamePlayerManager gamePlayerManager = gamePlayer.GetComponent<GamePlayerManager>();
+        GamePlayer gamePlayerManager = gamePlayer.GetComponent<GamePlayer>();
         
         lobbyManager.PlayerLoaded(lobbyPlayerManager, gamePlayerManager);
 

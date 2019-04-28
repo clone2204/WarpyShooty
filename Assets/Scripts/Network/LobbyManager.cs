@@ -111,7 +111,7 @@ public class LobbyManager : NetworkBehaviour, ILobbyManager
         realLobbyManager.StartGame();
     }
 
-    public void PlayerLoaded(LobbyPlayerManager lobbyPlayer, GamePlayerManager gameManager)
+    public void PlayerLoaded(LobbyPlayerManager lobbyPlayer, GamePlayer gameManager)
     {
         if (!isServer)
             return;

@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IProjectile 
 {
-    void Init(GamePlayerManager owner, Vector3 direction, float velocity, int damage);
+    void Init(GamePlayer owner, Vector3 direction, float velocity, int damage);
 }

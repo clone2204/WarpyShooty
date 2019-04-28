@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class RealPlayer : GamePlayer 
+public abstract class GamePlayer : NetworkBehaviour
 {
     private Camera playerPOV;
     private PlayerHUDManager playerHUD;
     private IWarp warpManager;
-    
-    [SyncVar] private string playerName;
 
+    [SyncVar] private string playerName;
+    [SerializeField] [SyncVar] protected int playerHealth;
+    [SerializeField] [SyncVar] protected GameManager.Team playerTeam;
+
+    protected GameManager gameManager;
+    protected WeaponManager weaponManager;
+
+    // Start is called before the first frame update
     void Start()
     {
         gameManager = GameObject.Find("_SCRIPTS_").GetComponentInChildren<GameManager>();
-
         playerPOV = GetComponentInChildren<Camera>();
         playerHUD = GameObject.Find("Menues").transform.Find("PlayerHud").GetComponent<PlayerHUDManager>();
         playerHUD.SetupCameras(GetComponentInChildren<Camera>());
@@ -23,6 +28,7 @@ public class RealPlayer : GamePlayer
         weaponManager = GetComponent<WeaponManager>();
     }
 
+    // Update is called once per frame
     private void Update()
     {
         playerHUD.SetWeaponName(weaponManager.GetWeaponName());
@@ -50,14 +56,21 @@ public class RealPlayer : GamePlayer
         return playerName;
     }
 
-    public override void SetHealth(int health)
+    public void SetHealth(int health)
     {
-        base.SetHealth(health);
+        if (!isServer)
+            return;
 
+        playerHealth = health;
         TargetUpdatePlayerHealth(connectionToClient);
     }
 
-    public override void DamagePlayer(int damage, GamePlayer damager)
+    public int GetHealth()
+    {
+        return playerHealth;
+    }
+
+    public void DamagePlayer(int damage, GamePlayer damager)
     {
         if (!isServer)
             return;
@@ -69,22 +82,14 @@ public class RealPlayer : GamePlayer
         playerHealth -= damage;
         TargetUpdatePlayerHealth(connectionToClient);
 
-        if (!(damager is RealPlayer))
-            return;
-
         if (playerHealth <= 0)
-            base.gameManager.KillPlayer(this, (RealPlayer)damager);
+            gameManager.KillPlayer(this, damager);
     }
 
-    public override Vector3 GetPlayerLookDirection()
+    public GameManager.Team GetTeam()
     {
-        float xrot = Mathf.Sin(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
-        float zrot = Mathf.Cos(Mathf.Deg2Rad * this.transform.rotation.eulerAngles.y) * Mathf.Cos(Mathf.Deg2Rad * this.playerPOV.transform.rotation.eulerAngles.x);
-        float yrot = -Mathf.Sin(Mathf.Deg2Rad * playerPOV.transform.rotation.eulerAngles.x);
-
-        return new Vector3(xrot, yrot, zrot);
+        return playerTeam;
     }
-
 
     public void EnablePlayer()
     {
@@ -100,6 +105,46 @@ public class RealPlayer : GamePlayer
     //Player Control Functions
     //=================================================================================================
 
+    public void StartPrimaryFire()
+    {
+        weaponManager.StartPrimaryFire(this);
+    }
+
+    public void StopPrimaryFire()
+    {
+        weaponManager.StopPrimaryFire();
+    }
+
+    public void StartAltFire()
+    {
+        weaponManager.StartAltFire(this);
+    }
+
+    public void StopAltFire()
+    {
+        weaponManager.StopAltFire();
+    }
+
+    public void StartReload()
+    {
+        weaponManager.StartReload();
+    }
+
+    public void StopReload()
+    {
+        weaponManager.StopReload();
+    }
+
+    public void StartWeaponPickup()
+    {
+        weaponManager.StartWeaponPickup();
+    }
+
+    public void StopWeaponPickup()
+    {
+        weaponManager.StopWeaponPickup();
+    }
+
     public void WarpPlayer()
     {
         warpManager.WarpPlayer();
@@ -111,15 +156,8 @@ public class RealPlayer : GamePlayer
     }
 
     //=================================================================================================
-    //Server Functions
-    //=================================================================================================
-
-
-
-    //=================================================================================================
     //Client Functions
     //=================================================================================================
-
 
     [TargetRpc]
     private void TargetSetupPlayer(NetworkConnection playerConn)

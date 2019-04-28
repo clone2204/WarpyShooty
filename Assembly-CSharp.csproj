@@ -72,7 +72,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\ObserverCamera.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
-    <Compile Include="Assets\Scripts\PlayerController\GamePlayerManager.cs" />
+    <Compile Include="Assets\Scripts\PlayerController\GamePlayer.cs" />
     <Compile Include="Assets\Scripts\PlayerController\ILobbyPlayerManager.cs" />
     <Compile Include="Assets\Scripts\PlayerController\IWarp.cs" />
     <Compile Include="Assets\Scripts\PlayerController\LobbyPlayerManager.cs" />
@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\PlayerController\Warp.cs" />
     <Compile Include="Assets\Scripts\SpawnPoint.cs" />
     <Compile Include="Assets\Scripts\SprayManager.cs" />
+    <Compile Include="Assets\Scripts\TargetDummy.cs" />
     <Compile Include="Assets\Scripts\UI\ErrorMessageManager.cs" />
     <Compile Include="Assets\Scripts\UI\LobbyUIManager.cs" />
     <Compile Include="Assets\Scripts\UI\MenuManager.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Assets\Scripts\UI\ServerBrowser.cs" />
     <Compile Include="Assets\Scripts\UI\SettingsManager.cs" />
     <Compile Include="Assets\Scripts\Weapons\Behaviors\AltFireBehaviors\EmptyAltFireBehavior.cs" />
+    <Compile Include="Assets\Scripts\Weapons\Behaviors\AmmoBahaviors\InfiniteAmmo.cs" />
     <Compile Include="Assets\Scripts\Weapons\Behaviors\AmmoBahaviors\StandardAmmoBehavior.cs" />
     <Compile Include="Assets\Scripts\Weapons\Behaviors\IAltFireBehavior.cs" />
     <Compile Include="Assets\Scripts\Weapons\Behaviors\IAmmoBehavior.cs" />

@@ -9,12 +9,12 @@ public class BasicProjectile : NetworkBehaviour, IProjectile
 
     private Rigidbody projectilePhysics;
 
-    private RealPlayer owner;
+    private GamePlayer owner;
     private Vector3 direction;
     private float velocity;
     private int damage;
     
-    public void Init(GamePlayerManager owner, Vector3 direction, float velocity, int damage)
+    public void Init(GamePlayer owner, Vector3 direction, float velocity, int damage)
     {
         projectilePhysics = this.GetComponent<Rigidbody>();
 
@@ -30,7 +30,7 @@ public class BasicProjectile : NetworkBehaviour, IProjectile
     void OnTriggerEnter(Collider other)
     {
 
-        GamePlayerManager targetPlayer = other.GetComponent<GamePlayerManager>();
+        GamePlayer targetPlayer = other.GetComponent<GamePlayer>();
 
         if (targetPlayer != null && isServer)
         {

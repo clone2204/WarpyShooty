@@ -40,9 +40,9 @@ public class Weapon : NetworkBehaviour, IWeapon
         transform.rotation = new Quaternion();
     }
 
-    public void StartPrimaryFire(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, Func<Vector3> GetLookDirection)
+    public void StartPrimaryFire(GamePlayer player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetSpawnDirection)
     {
-        primaryFireBehavior.PrimaryFireStart(player, GetSpawnLocation, GetLookDirection);
+        primaryFireBehavior.PrimaryFireStart(player, GetSpawnLocation, GetSpawnDirection);
     }
 
     public void StopPrimaryFire()
@@ -50,9 +50,9 @@ public class Weapon : NetworkBehaviour, IWeapon
         primaryFireBehavior.PrimaryFireStop();
     }
 
-    public void StartAltFire(GamePlayerManager player, System.Func<Vector3> GetSpawnLocation, Func<Vector3> GetLookDirection)
+    public void StartAltFire(GamePlayer player, System.Func<Vector3> GetSpawnLocation, System.Func<Vector3> GetSpawnDirection)
     {
-        altFireBehavior.StartAltFire(player, GetSpawnLocation, GetLookDirection);
+        altFireBehavior.StartAltFire(player, GetSpawnLocation, GetSpawnDirection);
     }
 
     public void StopAltFire()
