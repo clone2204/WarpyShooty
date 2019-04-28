@@ -9,7 +9,7 @@ public class BasicProjectile : NetworkBehaviour, IProjectile
 
     private Rigidbody projectilePhysics;
 
-    private GamePlayerManager owner;
+    private RealPlayer owner;
     private Vector3 direction;
     private float velocity;
     private int damage;
@@ -30,11 +30,19 @@ public class BasicProjectile : NetworkBehaviour, IProjectile
     void OnTriggerEnter(Collider other)
     {
 
-        if ((other.gameObject.tag == "localPlayer" || other.gameObject.tag == "Player") && isServer)
+        GamePlayerManager targetPlayer = other.GetComponent<GamePlayerManager>();
+
+        if (targetPlayer != null && isServer)
         {
-            GamePlayerManager targetPlayer = other.GetComponent<GamePlayerManager>();
             targetPlayer.DamagePlayer(damage, owner);
         }
+
+        TargetDummy targetDummy = other.GetComponent<TargetDummy>();
+        if(targetDummy != null && isServer)
+        {
+            targetDummy.DamageDummy(owner, damage);
+        }
+
         DestroyBulletInSeconds(0);
     }
 
